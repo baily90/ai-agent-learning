@@ -1,0 +1,132 @@
+# AI Agent 开发学习指南
+
+> 面向前端开发者的 AI Agent 开发完整学习路径
+> 从零基础到生产落地，TypeScript 全栈实战
+
+## 这份资料适合谁
+
+- **前端开发者**（React / Vue / Node.js），想进入 AI Agent 开发领域
+- **AI 初学者**，对 LLM、RAG、Agent 等概念似懂非懂，需要系统梳理
+- **想在工作中落地 Agent 功能**的工程师，而不只是跑个 demo
+
+## 你会得到什么
+
+- 从 Token 是什么到 Multi-Agent 系统上线的**完整知识体系**
+- 每个概念都有**前端类比**，用你熟悉的方式理解 AI 世界
+- **灵魂拷问**模块，像面试官一样追问每个知识点的本质
+- 一个**贯穿始终的实战项目**，每章都在上一章的基础上迭代
+
+## 贯穿项目：AI 智能工作助手
+
+从一个简单的聊天界面开始，逐章升级为一个能调用工具、检索知识库、自主规划执行、支持多 Agent 协作的全能工作助手。
+
+```
+第02章  → Hello AI 对话
+第04章  → 流式聊天界面
+第06章  → 智能模型切换
+第07章  → 能调工具（查天气、查数据）
+第08章  → 有了记忆（记住聊天历史）
+第09章  → 能检索知识库
+第12章  → 能自主规划多步任务
+第14章  → MCP 热插拔工具
+第15章  → 多个专业 Agent 协同
+第17章  → 专业级交互体验
+第23章  → 正式部署上线
+```
+
+## 技术栈
+
+- **语言**：TypeScript
+- **AI SDK**：Vercel AI SDK（统一抽象层，可切换任意模型）
+- **模型**：DeepSeek（示例），可替换为 OpenAI / Claude / 其他
+- **前端**：React + Next.js
+- **向量数据库**：示例使用 Chroma / Pinecone
+- **运行时**：Node.js
+
+## 章节目录
+
+### 第一部分：基础篇 — 理解 AI 世界的基本规则
+
+| 章节 | 主题 | 关键词 |
+|------|------|--------|
+| [第01章](part1-foundation/01-ai-llm-basics.md) | AI 与大语言模型基础 | Token、推理、幻觉、上下文窗口 |
+| [第02章](part1-foundation/02-environment-setup.md) | 开发环境搭建 & 第一次 API 调用 | Vercel AI SDK、DeepSeek、Provider |
+| [第03章](part1-foundation/03-prompt-engineering.md) | Prompt Engineering | System Prompt、Few-shot、CoT、提示词攻防 |
+| [第04章](part1-foundation/04-streaming-frontend.md) | 流式输出与前端集成 | SSE、React Hooks、打字机效果 |
+| [第05章](part1-foundation/05-structured-output.md) | 结构化输出 | JSON Mode、Zod Schema、类型安全 |
+| [第06章](part1-foundation/06-model-selection.md) | 模型选择与多模型策略 | 模型对比、成本权衡、Fallback |
+
+### 第二部分：能力篇 — 给 AI 装上手和眼睛
+
+| 章节 | 主题 | 关键词 |
+|------|------|--------|
+| [第07章](part2-capabilities/07-function-calling.md) | Function Calling / Tool Use | Agent 核心机制、工具定义、调用循环 |
+| [第08章](part2-capabilities/08-memory-context.md) | 对话记忆与上下文管理 | 短期记忆、长期记忆、滑动窗口、摘要压缩 |
+| [第09章](part2-capabilities/09-rag-basics.md) | RAG 基础 | Embedding、向量数据库、文档检索 |
+| [第10章](part2-capabilities/10-rag-advanced.md) | RAG 进阶 | 分块策略、混合检索、重排序、Graph RAG |
+| [第11章](part2-capabilities/11-multimodal.md) | 多模态能力 | 图片理解、语音、文件解析 |
+
+### 第三部分：Agent 篇 — 从工具人到自主决策者
+
+| 章节 | 主题 | 关键词 |
+|------|------|--------|
+| [第12章](part3-agent/12-agent-patterns.md) | Agent 核心模式 | ReAct、规划、自主决策循环 |
+| [第13章](part3-agent/13-multi-step-agent.md) | Multi-step Agent | 任务分解、执行链、错误恢复 |
+| [第14章](part3-agent/14-mcp-protocol.md) | MCP 协议 | 标准化工具接入、Server/Client |
+| [第15章](part3-agent/15-multi-agent.md) | Multi-Agent 协作 | 编排模式、通信机制、A2A 协议 |
+| [第16章](part3-agent/16-workflow-vs-agent.md) | Workflow vs Agent | 确定性流程 vs 自主决策、混合架构 |
+
+### 第四部分：体验篇 — 前端开发者的主场
+
+| 章节 | 主题 | 关键词 |
+|------|------|--------|
+| [第17章](part4-experience/17-agent-ui-ux.md) | Agent UI/UX 设计模式 | 审批流、Generative UI、进度展示 |
+| [第18章](part4-experience/18-error-handling.md) | 错误处理与容错 | 重试、降级、幻觉检测、确认机制 |
+
+### 第五部分：生产篇 — 从 demo 到上线
+
+| 章节 | 主题 | 关键词 |
+|------|------|--------|
+| [第19章](part5-production/19-security.md) | 安全与防护 | Prompt 注入、权限控制、内容过滤 |
+| [第20章](part5-production/20-evaluation-testing.md) | 评估与测试 | 质量评估、自动化测试、基准测试 |
+| [第21章](part5-production/21-observability.md) | 可观测性与调试 | Tracing、日志、行为回放 |
+| [第22章](part5-production/22-performance-cost.md) | 性能优化与成本控制 | Prompt 缓存、Token 管理、限流 |
+| [第23章](part5-production/23-deployment.md) | 部署与架构 | Serverless、Edge、AI Gateway |
+
+### 附录
+
+| 编号 | 内容 |
+|------|------|
+| [附录 A](appendix/A-glossary.md) | 术语表 — 所有概念的一句话定义和前端类比 |
+| [附录 B](appendix/B-fine-tuning.md) | Fine-tuning 概览 — 何时微调、与 RAG/Prompt 的关系 |
+| [附录 C](appendix/C-framework-comparison.md) | 主流框架横向对比 — Vercel AI SDK / LangChain.js / Mastra |
+| [附录 D](appendix/D-resources.md) | 推荐资源与社区 |
+
+## 每章结构
+
+每一章按以下结构组织，确保学习体验一致：
+
+```
+📖 引言         — 用场景或类比引出本章主题
+📚 核心概念      — 由浅入深讲解每个知识点
+🔍 概念辨析      — 易混淆概念对比
+🧠 灵魂拷问      — 深度追问，附详细解答
+✅ 最佳实践      — DO / DON'T，附原因
+💻 代码实战      — TypeScript 可运行示例
+🛠️ 实操练习      — 基于贯穿项目，有验收标准
+📝 本章小结      — 要点回顾
+```
+
+## 如何使用这份资料
+
+1. **按顺序学习**：章节间有递进关系，不建议跳章
+2. **一定要做练习**：每章结尾的实操练习是从"看懂"到"会做"的关键
+3. **跑通代码**：所有代码示例都可运行，建议手动敲一遍而不是复制粘贴
+4. **回顾灵魂拷问**：如果答不上来，说明这个知识点还需要再消化
+
+## 前置要求
+
+- 熟悉 TypeScript / JavaScript
+- 有 React 或 Vue 开发经验
+- 了解 Node.js 基础（Express / Koa 等）
+- 准备一个 DeepSeek API Key（或 OpenAI / Claude 等）
