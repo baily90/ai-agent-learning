@@ -132,3 +132,32 @@
 - 有 React 或 Vue 开发经验
 - 了解 Node.js 基础（Express / Koa 等）
 - 准备一个 DeepSeek API Key（或 OpenAI / Claude 等）
+
+## 发布到线上
+
+本站已部署到 GitHub Pages：<https://baily90.github.io/ai-agent-learning/>
+
+文章改动后，推送到 `main` 分支即可自动上线（GitHub Actions 自动构建部署）：
+
+```bash
+git add .
+git commit -m "docs: 描述这次改了什么"
+git push origin main
+```
+
+等 1~3 分钟，刷新网页即可看到新内容。
+
+### 本地预览（可选）
+
+推送前先本地看一眼，避免发出去才发现问题：
+
+```bash
+npm run docs:dev    # 开发预览，改文件实时热更新
+# 或构建后预览
+npm run docs:build && npm run docs:preview
+```
+
+### 推送后没生效怎么办
+
+- **网页手动触发**：仓库 → Actions → 左侧「Deploy VitePress site to Pages」→ 右侧 Run workflow
+- **空提交触发**：`git commit --allow-empty -m "chore(ci): 触发 Pages 重新部署" && git push origin main`
