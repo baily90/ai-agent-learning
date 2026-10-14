@@ -75,7 +75,7 @@
 | [第13章](03-Agent篇/13-Multi-step-Agent.md) | Multi-step Agent | 任务分解、执行链、错误恢复 |
 | [第14章](03-Agent篇/14-MCP协议.md) | MCP 协议 | 标准化工具接入、Server/Client |
 | [第15章](03-Agent篇/15-Multi-Agent协作.md) | Multi-Agent 协作 | 编排模式、通信机制、A2A 协议 |
-| [第16章](03-Agent篇/16-Workflow与Agent.md) | Workflow vs Agent | 确定性流程 vs 自主决策、混合架构 |
+| [第16章](03-Agent篇/16-Workflow与Agent.md) | Workflow vs Agent | 确定性流程 vs 自主决策、混合架构、LangGraph 编排 |
 
 ### 第四部分：体验篇 — 前端开发者的主场
 

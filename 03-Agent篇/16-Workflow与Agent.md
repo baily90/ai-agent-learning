@@ -491,6 +491,140 @@ Level 5: Multi-Agent 系统
 
 ---
 
+## 16.9 LangGraph：用框架做编排
+
+### 一句话直觉
+
+**LangGraph 是「把 Agent/Workflow 显式画成一张有向图」的编排框架**——你把每个步骤定义成节点（Node），把步骤之间的流转定义成边（Edge），LangGraph 负责运行这张图、管理状态、处理持久化和人在环中断。
+
+前面 16.1-16.7 我们用手写代码实现 Workflow 和 Agent，LangGraph 是把这套东西「框架化」了。
+
+### 前端类比
+
+LangGraph 之于 Agent 编排，就像 **XState（状态机库）之于复杂前端状态管理**。
+
+```
+XState：把组件的状态流转画成状态机，声明式地定义「什么状态下能发生什么转换」
+LangGraph：把 Agent 的步骤流转画成图，声明式地定义「什么节点后跟什么节点」
+```
+
+或者更直白：它像 **React Router 的路由配置**——你声明一堆「路由」（节点）和「跳转规则」（边），框架帮你处理导航。区别是 LangGraph 的路由不是 URL，而是 Agent 的**状态**。
+
+### 核心概念（就 4 个）
+
+**1. 状态（State）**：在节点之间传递的共享数据。通常是一个对象，比如 `{ messages: [...] }`。每个节点读状态、返回状态的部分更新，LangGraph 负责合并。
+
+**2. 节点（Node）**：图里的一个计算步骤。可以是调用 LLM、执行工具、或者一段纯代码（确定性逻辑）。
+
+**3. 边（Edge）**：节点之间的连接。`START → A → END` 表示从开始到节点 A 再到结束。
+
+**4. 条件边（Conditional Edge）**：根据状态动态决定下一步去哪。这是实现「Workflow 里的路由」和「Agent 里的循环」的关键。
+
+### 生态定位（2026 年现状，重要）
+
+LangChain 团队现在的产品分层非常清晰，别再把 LangGraph 当成 LangChain 的附属品：
+
+| 层 | 产品 | 职责 |
+|----|------|------|
+| 框架 | **LangChain** | 模型/工具/Agent 循环的组件和集成 |
+| 编排运行时 | **LangGraph** | 图、状态、持久执行、流式、人在环 |
+| Harness | **Deep Agents** | 在 LangGraph 之上的高层 Agent（规划/子Agent/上下文管理） |
+| 观测平台 | **LangSmith** | 追踪、评估、部署 |
+
+**关键点**：LangGraph 是**底层编排框架**，它不抽象 prompt、不抽象 Agent 架构，只负责「把步骤组织成图并可靠地运行」。而且**你可以不用 LangChain 单独用 LangGraph**。
+
+### 代码实战：Hello World + 一个混合工作流
+
+安装：
+
+```bash
+npm install @langchain/langgraph @langchain/core
+```
+
+**Hello World**（官方示例）：
+
+```typescript
+import { StateSchema, MessagesValue, type GraphNode, StateGraph, START, END } from "@langchain/langgraph";
+
+// 1. 定义状态
+const State = new StateSchema({
+  messages: MessagesValue,
+});
+
+// 2. 定义节点（这里用 mock LLM，实际项目接真实的模型）
+const mockLlm: GraphNode<typeof State> = (state) => {
+  return { messages: [{ role: "ai", content: "hello world" }] };
+};
+
+// 3. 组装图：START → mock_llm → END
+const graph = new StateGraph(State)
+  .addNode("mock_llm", mockLlm)
+  .addEdge(START, "mock_llm")
+  .addEdge("mock_llm", END)
+  .compile();
+
+// 4. 运行
+await graph.invoke({ messages: [{ role: "user", content: "hi!" }] });
+```
+
+**混合工作流（LangGraph 的核心价值）**：把「确定性步骤」和「LLM 步骤」放进同一张图——这正是第 16.5 节「混合架构」的框架化实现：
+
+```typescript
+import { StateGraph, START, END } from "@langchain/langgraph";
+
+// 状态：包含用户输入和处理结果
+interface WorkflowState {
+  userInput: string;
+  classification?: string;   // 确定性步骤写
+  answer?: string;           // LLM 步骤写
+}
+
+// 节点 1：确定性步骤（纯代码，可审计、可预测）
+function classifyNode(state: WorkflowState) {
+  const hasKeywords = /退款|退货|投诉/.test(state.userInput);
+  return { classification: hasKeywords ? "complaint" : "general" };
+}
+
+// 节点 2：LLM 步骤（模型驱动，灵活）
+async function answerNode(state: WorkflowState) {
+  // 这里接真实的 LLM 调用，示意省略
+  return { answer: `已根据「${state.classification}」类型生成回复` };
+}
+
+const graph = new StateGraph<WorkflowState>(null as any)
+  .addNode("classify", classifyNode)
+  .addNode("answer", answerNode)
+  .addEdge(START, "classify")
+  .addEdge("classify", "answer")
+  .addEdge("answer", END)
+  .compile();
+
+await graph.invoke({ userInput: "我要退款" });
+```
+
+> 注：上面第二个示例是概念示意（状态类型和 `StateSchema` 的具体写法以官方文档为准）。核心思想是：**节点可以是纯函数也可以是 LLM 调用，边把它们的顺序固定下来**。条件边（`addConditionalEdges`）可以让你根据 `classification` 决定走「投诉处理」还是「普通回答」两条不同的路。
+
+### LangGraph vs 手写编排（第 15、16 章的方式）
+
+| 维度 | 手写编排（Vercel AI SDK） | LangGraph |
+|------|------------------------|----------|
+| 流程可视化 | 靠代码阅读 | 图结构一目了然 |
+| 持久化/断点续跑 | 自己实现 | 内置（durable execution） |
+| 人在环（Human-in-the-loop） | 自己实现 | 内置（interrupt） |
+| 流式/中间状态 | 自己实现 | 内置 |
+| 上手成本 | 低（你已经会了） | 中（要学图模型） |
+| 灵活度 | 极高 | 高，但受图模型约束 |
+
+**结论**：简单场景手写就够；当你的 Agent 系统开始需要「断点续跑、人在环审批、可视化调试」这些生产级能力时，LangGraph 的价值就体现出来了。
+
+### 注意事项（诚实提醒）
+
+1. **JS 版成熟度不如 Python 版**：LangGraph 的主力生态在 Python，JS 版（`@langchain/langgraph`）能用但示例、社区、坑都比 Python 少。你是 TS 前端，**了解核心思想 + 能跑通即可，不必深钻 JS 版**。
+2. **LangGraph 是底层框架**：它不管 prompt 怎么写、Agent 怎么设计，只负责编排。所以它**不替代**你对 Agent 概念的理解——第 7-16 章学的工具调用、记忆、RAG、多 Agent 才是核心，LangGraph 只是把它们「组织成图」的工具。
+3. **和你的主线（Vercel AI SDK）不冲突**：两者可以混用——用 AI SDK 做模型调用，用 LangGraph 做复杂编排。别把框架当信仰。
+
+---
+
 ## 概念辨析
 
 ### Workflow vs Pipeline vs Chain

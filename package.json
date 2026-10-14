@@ -1,0 +1,15 @@
+{
+  "name": "ai-agent-learning",
+  "version": "1.0.0",
+  "private": true,
+  "description": "面向前端开发者的 AI Agent 开发完整学习路径",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}
