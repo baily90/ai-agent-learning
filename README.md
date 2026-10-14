@@ -31,7 +31,8 @@
 第14章  → MCP 热插拔工具
 第15章  → 多个专业 Agent 协同
 第17章  → 专业级交互体验
-第23章  → 正式部署上线
+第18章  → 生成式 UI（组件化展示）
+第24章  → 正式部署上线
 ```
 
 ## 技术栈
@@ -49,58 +50,59 @@
 
 | 章节 | 主题 | 关键词 |
 |------|------|--------|
-| [第01章](part1-foundation/01-ai-llm-basics.md) | AI 与大语言模型基础 | Token、推理、幻觉、上下文窗口 |
-| [第02章](part1-foundation/02-environment-setup.md) | 开发环境搭建 & 第一次 API 调用 | Vercel AI SDK、DeepSeek、Provider |
-| [第03章](part1-foundation/03-prompt-engineering.md) | Prompt Engineering | System Prompt、Few-shot、CoT、提示词攻防 |
-| [第04章](part1-foundation/04-streaming-frontend.md) | 流式输出与前端集成 | SSE、React Hooks、打字机效果 |
-| [第05章](part1-foundation/05-structured-output.md) | 结构化输出 | JSON Mode、Zod Schema、类型安全 |
-| [第06章](part1-foundation/06-model-selection.md) | 模型选择与多模型策略 | 模型对比、成本权衡、Fallback |
+| [第01章](01-基础篇/01-AI与大语言模型基础.md) | AI 与大语言模型基础 | Token、推理、幻觉、上下文窗口 |
+| [第02章](01-基础篇/02-开发环境搭建与第一次API调用.md) | 开发环境搭建 & 第一次 API 调用 | Vercel AI SDK、DeepSeek、Provider |
+| [第03章](01-基础篇/03-Prompt工程.md) | Prompt Engineering | System Prompt、Few-shot、CoT、提示词攻防 |
+| [第04章](01-基础篇/04-流式输出与前端集成.md) | 流式输出与前端集成 | SSE、React Hooks、打字机效果 |
+| [第05章](01-基础篇/05-结构化输出.md) | 结构化输出 | JSON Mode、Zod Schema、类型安全 |
+| [第06章](01-基础篇/06-模型选择与多模型策略.md) | 模型选择与多模型策略 | 模型对比、成本权衡、Fallback |
 
 ### 第二部分：能力篇 — 给 AI 装上手和眼睛
 
 | 章节 | 主题 | 关键词 |
 |------|------|--------|
-| [第07章](part2-capabilities/07-function-calling.md) | Function Calling / Tool Use | Agent 核心机制、工具定义、调用循环 |
-| [第08章](part2-capabilities/08-memory-context.md) | 对话记忆与上下文管理 | 短期记忆、长期记忆、滑动窗口、摘要压缩 |
-| [第09章](part2-capabilities/09-rag-basics.md) | RAG 基础 | Embedding、向量数据库、文档检索 |
-| [第10章](part2-capabilities/10-rag-advanced.md) | RAG 进阶 | 分块策略、混合检索、重排序、Graph RAG |
-| [第11章](part2-capabilities/11-multimodal.md) | 多模态能力 | 图片理解、语音、文件解析 |
+| [第07章](02-能力篇/07-Function-Calling工具调用.md) | Function Calling / Tool Use | Agent 核心机制、工具定义、调用循环 |
+| [第08章](02-能力篇/08-对话记忆与上下文管理.md) | 对话记忆与上下文管理 | 短期记忆、长期记忆、滑动窗口、摘要压缩 |
+| [第09章](02-能力篇/09-RAG基础.md) | RAG 基础 | Embedding、向量数据库、文档检索 |
+| [第10章](02-能力篇/10-RAG进阶.md) | RAG 进阶 | 分块策略、混合检索、重排序、Graph RAG |
+| [第11章](02-能力篇/11-多模态能力.md) | 多模态能力 | 图片理解、语音、文件解析 |
 
 ### 第三部分：Agent 篇 — 从工具人到自主决策者
 
 | 章节 | 主题 | 关键词 |
 |------|------|--------|
-| [第12章](part3-agent/12-agent-patterns.md) | Agent 核心模式 | ReAct、规划、自主决策循环 |
-| [第13章](part3-agent/13-multi-step-agent.md) | Multi-step Agent | 任务分解、执行链、错误恢复 |
-| [第14章](part3-agent/14-mcp-protocol.md) | MCP 协议 | 标准化工具接入、Server/Client |
-| [第15章](part3-agent/15-multi-agent.md) | Multi-Agent 协作 | 编排模式、通信机制、A2A 协议 |
-| [第16章](part3-agent/16-workflow-vs-agent.md) | Workflow vs Agent | 确定性流程 vs 自主决策、混合架构 |
+| [第12章](03-Agent篇/12-Agent核心模式.md) | Agent 核心模式 | ReAct、规划、自主决策循环 |
+| [第13章](03-Agent篇/13-Multi-step-Agent.md) | Multi-step Agent | 任务分解、执行链、错误恢复 |
+| [第14章](03-Agent篇/14-MCP协议.md) | MCP 协议 | 标准化工具接入、Server/Client |
+| [第15章](03-Agent篇/15-Multi-Agent协作.md) | Multi-Agent 协作 | 编排模式、通信机制、A2A 协议 |
+| [第16章](03-Agent篇/16-Workflow与Agent.md) | Workflow vs Agent | 确定性流程 vs 自主决策、混合架构 |
 
 ### 第四部分：体验篇 — 前端开发者的主场
 
 | 章节 | 主题 | 关键词 |
 |------|------|--------|
-| [第17章](part4-experience/17-agent-ui-ux.md) | Agent UI/UX 设计模式 | 审批流、Generative UI、进度展示 |
-| [第18章](part4-experience/18-error-handling.md) | 错误处理与容错 | 重试、降级、幻觉检测、确认机制 |
+| [第17章](04-体验篇/17-Agent-UI-UX设计.md) | Agent UI/UX 设计模式 | 审批流、Generative UI、进度展示 |
+| [第18章](04-体验篇/18-生成式UI与流式渲染.md) | 生成式 UI（Generative UI） | 工具调用驱动 UI、组件映射、流式渲染 |
+| [第19章](04-体验篇/19-错误处理与容错.md) | 错误处理与容错 | 重试、降级、幻觉检测、确认机制 |
 
 ### 第五部分：生产篇 — 从 demo 到上线
 
 | 章节 | 主题 | 关键词 |
 |------|------|--------|
-| [第19章](part5-production/19-security.md) | 安全与防护 | Prompt 注入、权限控制、内容过滤 |
-| [第20章](part5-production/20-evaluation-testing.md) | 评估与测试 | 质量评估、自动化测试、基准测试 |
-| [第21章](part5-production/21-observability.md) | 可观测性与调试 | Tracing、日志、行为回放 |
-| [第22章](part5-production/22-performance-cost.md) | 性能优化与成本控制 | Prompt 缓存、Token 管理、限流 |
-| [第23章](part5-production/23-deployment.md) | 部署与架构 | Serverless、Edge、AI Gateway |
+| [第20章](05-生产篇/20-安全与防护.md) | 安全与防护 | Prompt 注入、权限控制、内容过滤 |
+| [第21章](05-生产篇/21-评估与测试.md) | 评估与测试 | 质量评估、自动化测试、基准测试 |
+| [第22章](05-生产篇/22-可观测性与调试.md) | 可观测性与调试 | Tracing、日志、行为回放 |
+| [第23章](05-生产篇/23-性能优化与成本控制.md) | 性能优化与成本控制 | Prompt 缓存、Token 管理、限流 |
+| [第24章](05-生产篇/24-部署与架构.md) | 部署与架构 | Serverless、Edge、AI Gateway |
 
 ### 附录
 
 | 编号 | 内容 |
 |------|------|
-| [附录 A](appendix/A-glossary.md) | 术语表 — 所有概念的一句话定义和前端类比 |
-| [附录 B](appendix/B-fine-tuning.md) | Fine-tuning 概览 — 何时微调、与 RAG/Prompt 的关系 |
-| [附录 C](appendix/C-framework-comparison.md) | 主流框架横向对比 — Vercel AI SDK / LangChain.js / Mastra |
-| [附录 D](appendix/D-resources.md) | 推荐资源与社区 |
+| [附录 A](附录/A-术语表.md) | 术语表 — 所有概念的一句话定义和前端类比 |
+| [附录 B](附录/B-微调概览.md) | Fine-tuning 概览 — 何时微调、与 RAG/Prompt 的关系 |
+| [附录 C](附录/C-框架对比.md) | 主流框架横向对比 — Vercel AI SDK / LangChain.js / Mastra |
+| [附录 D](附录/D-推荐资源.md) | 推荐资源与社区 |
 
 ## 每章结构
 
