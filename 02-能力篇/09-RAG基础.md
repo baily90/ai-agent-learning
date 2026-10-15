@@ -184,7 +184,7 @@ Embedding 模型是一个独立的神经网络（注意：它不是大语言模�
 
 **1. Embedding 模型和 LLM 是两个不同的东西**
 
-LLM（如 GPT-4、Claude）的任务是**生成文本**——输入一段话，输出下一段话。
+LLM（如 GPT-5、Claude）的任务是**生成文本**——输入一段话，输出下一段话。
 
 Embedding 模型（如 `text-embedding-3-small`、`bge-large`）的任务是**编码语义**——输入一段话，输出一个固定长度的数字向量。
 

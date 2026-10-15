@@ -566,7 +566,7 @@ Prompt Chaining 的优势：
 
 网上流传的"万能 Prompt 模板"通常无法直接使用，因为：
 
-- 不同模型对同一个 Prompt 的反应不同（GPT-4、Claude、DeepSeek 各有"脾气"）
+- 不同模型对同一个 Prompt 的反应不同（GPT-5、Claude、DeepSeek 各有"脾气"）
 - 你的具体场景和模板作者的场景不同
 - 模板可能针对的是旧版本模型
 

@@ -221,7 +221,7 @@ console.log(result);
 
 ### 缺点
 
-- **只支持 Claude 模型**：如果你想切换到 GPT-4 或 DeepSeek，需要换 SDK
+- **只支持 Claude 模型**：如果你想切换到 GPT-5 或 DeepSeek，需要换 SDK
 - **生态相对较新**：社区插件和第三方集成不如 LangChain 丰富
 - **前端集成需要额外工作**：不像 Vercel AI SDK 有开箱即用的 React Hooks
 - **RAG 需要自建**：SDK 本身不内置 RAG 流水线
