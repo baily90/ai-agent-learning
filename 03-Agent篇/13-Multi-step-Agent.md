@@ -826,12 +826,13 @@ export type AgentEvent =
 
 ```typescript
 // planner.ts — 任务分解模块
+import { openai } from '@ai-sdk/openai';
 import { generateText, Output, isStepCount } from 'ai';
 import { PlanSchema, type Plan } from './types';
 
 export async function createPlan(userGoal: string): Promise<Plan> {
   const { output: plan } = await generateText({
-    model: 'openai/gpt-5',
+    model: openai('gpt-5'),
     output: Output.object({ schema: PlanSchema }),
     prompt: `你是一个任务规划专家。请将以下用户目标分解为 3-8 个可执行的步骤。
 
@@ -901,6 +902,7 @@ export function validatePlan(plan: Plan): { valid: boolean; issues: string[] } {
 
 ```typescript
 // executor.ts — 步骤执行引擎
+import { openai } from '@ai-sdk/openai';
 import { generateText, isStepCount } from 'ai';
 import type { Step, Checkpoint, AgentEvent } from './types';
 
@@ -938,7 +940,7 @@ ${context ? `\n待审校的内容：\n${context}` : ''}`,
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const { text } = await generateText({
-        model: 'openai/gpt-5',
+        model: openai('gpt-5'),
         prompt: actionPrompts[step.action] || actionPrompts.generate,
         maxOutputTokens: 2000,
       });

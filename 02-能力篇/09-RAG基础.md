@@ -922,6 +922,7 @@ indexDocuments().catch(console.error);
 // 完整的 RAG 查询流程
 
 import { generateText } from 'ai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { ChromaClient, OpenAIEmbeddingFunction } from 'chromadb';
 
 async function ragQuery(userQuestion: string) {
@@ -976,7 +977,7 @@ ${context}
   // === 第三步：调用 LLM 生成回答 ===
 
   const { text } = await generateText({
-    model: 'deepseek/deepseek-flash',
+    model: deepseek('deepseek-chat'),
     instructions: systemPrompt,
     prompt: userQuestion,
   });

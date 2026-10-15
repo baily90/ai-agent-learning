@@ -1410,13 +1410,14 @@ export function ApprovalFlow({
 ```typescript
 // app/api/agent-chat/route.ts
 import { streamText, tool } from 'ai';
+import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
   const result = streamText({
-    model: 'openai/gpt-5',
+    model: openai('gpt-5'),
     instructions: `你是一个数据分析助手。当用户需要查看数据时，
 调用合适的工具来获取和展示数据。`,
     messages,

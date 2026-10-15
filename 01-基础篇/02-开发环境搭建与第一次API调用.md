@@ -55,7 +55,7 @@ const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
 const deepseekResponse = await fetch('https://api.deepseek.com/chat/completions', {
   method: 'POST',
   headers: { 'Authorization': `Bearer ${DEEPSEEK_KEY}`, 'Content-Type': 'application/json' },
-  body: JSON.stringify({ model: 'deepseek-flash', messages: [...] })
+  body: JSON.stringify({ model: 'deepseek-chat', messages: [...] })
 });
 ```
 
@@ -74,12 +74,15 @@ const deepseekResponse = await fetch('https://api.deepseek.com/chat/completions'
 ```typescript
 // 有了 AI SDK，同一套代码切换任意模型
 import { generateText } from 'ai';
+import { deepseek } from '@ai-sdk/deepseek';
+// import { openai } from '@ai-sdk/openai';
+// import { anthropic } from '@ai-sdk/anthropic';
 
-// 换模型？改一行字符串就行
+// 换模型？换 provider 函数就行
 const { text } = await generateText({
-  model: 'deepseek/deepseek-flash',       // 换模型只需改这一行
-  // model: 'openai/gpt-5',               // 切到 OpenAI
-  // model: 'anthropic/claude-sonnet-5-5', // 切到 Anthropic
+  model: deepseek('deepseek-chat'),       // 换模型只需改这一行
+  // model: openai('gpt-5'),               // 切到 OpenAI
+  // model: anthropic('claude-sonnet-5-5'), // 切到 Anthropic
   prompt: '你好，请介绍一下自己',
 });
 ```
@@ -152,27 +155,28 @@ AI SDK 的 Provider 做的是完全相同的事情——你写统一的 `generat
 
 ### 深入原理
 
-**字符串 model 背后的 Provider 机制**
+**Provider 函数背后的机制**
 
-在 AI SDK 5 里，你通常用字符串直接指定模型，例如 `model: 'deepseek/deepseek-flash'`。这个字符串其实包含两部分信息：
+在 AI SDK 7 里，你通过 provider 包提供的工厂函数来创建模型实例。例如 `deepseek('deepseek-chat')` 这一行，做了两件事：
 
 ```
-'deepseek/deepseek-flash'
+deepseek('deepseek-chat')
   ↑         ↑
   Provider  模型 ID
 ```
 
-SDK 看到 `deepseek` 这个 Provider 名，会自动加载对应的 provider（`@ai-sdk/deepseek`），把它翻译成 DeepSeek 的 API 格式。所以：
+`deepseek` 是 `@ai-sdk/deepseek` 导出的工厂函数，它接收模型 ID，返回一个配置好 DeepSeek API 地址和认证方式的 `LanguageModel` 对象。SDK 拿到这个对象后，把它翻译成 DeepSeek 的 API 格式。所以：
 
-- **换 Provider = 改字符串里的 Provider 名**：`deepseek/deepseek-flash` → `openai/gpt-5`，一行搞定
-- **换模型 = 改字符串里的模型 ID**：`deepseek/deepseek-flash` → `deepseek/deepseek-v4-pro`
+- **换 Provider = 换 import 和工厂函数**：`deepseek('deepseek-chat')` → `openai('gpt-5')`，同时把 import 换成对应的 provider 包
+- **换模型 = 改工厂函数里的模型 ID**：`deepseek('deepseek-chat')` → `deepseek('deepseek-reasoner')`
 
 ```typescript
 import { generateText } from 'ai';
+import { deepseek } from '@ai-sdk/deepseek';
 
-// 换模型？改字符串就行
+// 换模型？改工厂函数里的模型 ID 就行
 const { text } = await generateText({
-  model: 'deepseek/deepseek-flash',   // 换成 'openai/gpt-5' 就切到 OpenAI
+  model: deepseek('deepseek-chat'),   // 换成 openai('gpt-5') 就切到 OpenAI
   prompt: '你好，请介绍一下自己',
 });
 ```
@@ -182,6 +186,7 @@ const { text } = await generateText({
 大多数时候你不需要手动创建 Provider。但有些场景（自定义 baseURL、自定义 headers、代理）需要显式配置。这时用 `createDeepSeek` 等工厂函数：
 
 ```typescript
+import { generateText } from 'ai';
 import { createDeepSeek } from '@ai-sdk/deepseek';
 
 const deepseek = createDeepSeek({
@@ -191,7 +196,7 @@ const deepseek = createDeepSeek({
 });
 
 const { text } = await generateText({
-  model: deepseek('deepseek-v4-pro'),
+  model: deepseek('deepseek-chat'),
   prompt: '你好',
 });
 ```
@@ -261,8 +266,11 @@ npx tsc --init
 **Step 3：安装 Vercel AI SDK 和 Provider**
 
 ```bash
-# 核心包（字符串 model 方式无需单独安装 provider 包）
+# 核心包
 npm install ai
+
+# DeepSeek 官方 provider 包
+npm install @ai-sdk/deepseek
 
 # 环境变量管理
 npm install dotenv
@@ -362,13 +370,14 @@ DEEPSEEK_API_KEY=sk-your-deepseek-api-key-here
 
 import 'dotenv/config';
 import { generateText } from 'ai';
+import { deepseek } from '@ai-sdk/deepseek';
 
 async function main() {
   console.log('正在调用 DeepSeek API...\n');
 
-  // 用字符串直接指定模型（provider/modelId 格式），无需单独安装 provider 包
+  // 直连 DeepSeek 官方 provider，自动读取 DEEPSEEK_API_KEY
   const result = await generateText({
-    model: 'deepseek/deepseek-flash',
+    model: deepseek('deepseek-chat'),
     prompt: '请用一句话介绍你自己，然后给前端开发者一个学习 AI 的建议。',
   });
 
@@ -394,9 +403,12 @@ npx tsx src/01-hello-ai.ts
 ### generateText 的参数详解
 
 ```typescript
+import { generateText } from 'ai';
+import { deepseek } from '@ai-sdk/deepseek';
+
 const result = await generateText({
   // 必需参数
-  model: 'deepseek/deepseek-flash',  // 字符串指定模型（provider/modelId）
+  model: deepseek('deepseek-chat'),  // provider 工厂函数指定模型
   prompt: '介绍一下 React',           // 用户输入（简单字符串形式）
 
   // 系统提示词用 instructions（不再是 messages 里的 role: 'system'）
@@ -464,11 +476,12 @@ System Prompt 是给模型设定"人设"和"规则"的指令。它是 Agent 开�
 // src/02-system-prompt.ts
 import 'dotenv/config';
 import { generateText } from 'ai';
+import { deepseek } from '@ai-sdk/deepseek';
 
 async function main() {
   // 示例 1：没有 system prompt 的"裸调用"
   const withoutSystem = await generateText({
-    model: 'deepseek/deepseek-flash',
+    model: deepseek('deepseek-chat'),
     prompt: '帮我写一个按钮组件',
   });
 
@@ -478,7 +491,7 @@ async function main() {
 
   // 示例 2：用 instructions 设定人设和规则
   const withSystem = await generateText({
-    model: 'deepseek/deepseek-flash',
+    model: deepseek('deepseek-chat'),
     instructions: `You are a senior frontend developer specializing in React and TypeScript.
 Rules:
 - Always use TypeScript with proper type annotations
@@ -517,32 +530,34 @@ main().catch(console.error);
 ```typescript
 // src/03-switch-provider.ts
 import 'dotenv/config';
-import { generateText } from 'ai';
+import { generateText, type LanguageModel } from 'ai';
+import { deepseek } from '@ai-sdk/deepseek';
+// import { openai } from '@ai-sdk/openai';
 
 // ============================================
 // 模型注册表——集中管理所有可用模型
 // ============================================
 
-// 字符串 model 时代，模型就是一行字符串，注册表更简单了
+// provider 工厂函数返回的是 LanguageModel 对象
 interface ModelConfig {
-  model: string;   // 字符串 model（provider/modelId）
+  model: LanguageModel;   // provider 工厂函数创建的模型实例
   name: string;
   costTier: 'low' | 'medium' | 'high';
 }
 
 const modelRegistry: Record<string, ModelConfig> = {
-  'deepseek-flash': {
-    model: 'deepseek/deepseek-flash',
-    name: 'DeepSeek V4 Flash',
+  'deepseek-chat': {
+    model: deepseek('deepseek-chat'),
+    name: 'DeepSeek V4',
     costTier: 'low',
   },
-  'deepseek-pro': {
-    model: 'deepseek/deepseek-v4-pro',
+  'deepseek-reasoner': {
+    model: deepseek('deepseek-reasoner'),
     name: 'DeepSeek V4 Pro',
     costTier: 'medium',
   },
   // 按需添加更多模型...
-  // 'gpt-5': { model: 'openai/gpt-5', name: 'GPT-5', costTier: 'high' },
+  // 'gpt-5': { model: openai('gpt-5'), name: 'GPT-5', costTier: 'high' },
 };
 
 // ============================================
@@ -584,8 +599,8 @@ async function main() {
   const question = '用 TypeScript 写一个防抖函数，附上类型注解。';
   const systemPrompt = 'You are a TypeScript expert. Write concise, well-typed code. Respond in Chinese.';
 
-  // 用 DeepSeek Flash 回答
-  await askAI('deepseek-flash', question, systemPrompt);
+  // 用 DeepSeek V4 回答
+  await askAI('deepseek-chat', question, systemPrompt);
 
   // 有 key 的话，可以对比其他模型
   // await askAI('gpt-5', question, systemPrompt);
@@ -634,7 +649,7 @@ Headers: {
   "Content-Type": "application/json"
 }
 Body: {
-  "model": "deepseek-flash",
+  "model": "deepseek-chat",
   "messages": [
     {"role": "system", "content": "..."},
     {"role": "user", "content": "..."}
@@ -683,6 +698,7 @@ API 调用一定会遇到错误。不处理错误的代码不是"乐观"，是"�
 // src/04-error-handling.ts
 import 'dotenv/config';
 import { generateText } from 'ai';
+import { deepseek } from '@ai-sdk/deepseek';
 
 // ============================================
 // 错误分类和处理策略
@@ -702,7 +718,7 @@ async function safeGenerateText(options: AICallOptions): Promise<string> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const result = await generateText({
-        model: 'deepseek/deepseek-flash',
+        model: deepseek('deepseek-chat'),
         instructions: systemPrompt,
         prompt,
         maxOutputTokens: 1000,
@@ -855,8 +871,8 @@ const waitTime = retryDelayMs * Math.pow(2, attempt - 1) + Math.random() * 500;
 
 | 模型 | 输入价格 ($/百万token) | 输出价格 ($/百万token) | 输出/输入 比率 |
 |------|---------------------|---------------------|--------------|
-| DeepSeek-V4-Flash（off-peak） | $0.15 | $0.60 | 4.0x |
-| DeepSeek-V4-Pro（off-peak） | $0.66 | $1.98 | 3.0x |
+| DeepSeek V4（off-peak） | $0.15 | $0.60 | 4.0x |
+| DeepSeek V4 Pro（off-peak） | $0.66 | $1.98 | 3.0x |
 | GPT-5.x | ~$1.25 | ~$10.00 | ~8.0x |
 | Claude Sonnet 4/5 | ~$3.00 | ~$15.00 | 5.0x |
 
@@ -886,7 +902,7 @@ const waitTime = retryDelayMs * Math.pow(2, attempt - 1) + Math.random() * 500;
   输入 = 200 + 800 + 50 + 300 = 1,350 tokens
   输出 = 200 tokens
 
-使用 DeepSeek-V4-Flash（off-peak）：
+使用 DeepSeek V4（off-peak）：
   单次成本 = 1,350 × $0.15/M + 200 × $0.60/M = $0.0003225
   日成本 = $0.0003225 × 200 = $0.0645
   月成本 = $0.0645 × 22 (工作日) = $1.42
@@ -1028,13 +1044,14 @@ DeepSeek 月成本不到 1.5 美元，GPT-5.x 约 16 美元——差了 10 倍�
 
 import 'dotenv/config';
 import { generateText } from 'ai';
+import { deepseek } from '@ai-sdk/deepseek';
 import * as readline from 'readline';
 
 // ============================================
 // 配置
 // ============================================
 
-const MODEL = 'deepseek/deepseek-flash';
+const MODEL = deepseek('deepseek-chat');
 
 const SYSTEM_PROMPT = `You are an intelligent work assistant for frontend developers.
 Your capabilities:
@@ -1196,7 +1213,7 @@ npx tsx src/index.ts
 ```
 
 **这个 v0.1 版本已经包含了：**
-- 字符串模型选择
+- provider 工厂函数选择模型
 - System Prompt 设定
 - 对话历史管理（带滑动窗口）
 - 错误处理和重试（指数退避 + 随机抖动）
@@ -1255,7 +1272,7 @@ npx tsx src/index.ts
 - 实现一个简单的"会话摘要"功能：当对话超过 10 轮时，自动用 LLM 总结前面的对话，替换掉原始历史
 - 添加 `/cost` 命令，累计显示当前会话总共消耗了多少 token 和对应的美元成本
 - 用 `streamText` 替换 `generateText`，实现逐字打印效果（预习下一章内容）
-- 实现模型热切换：在对话中输入 `/model deepseek-flash` 切换模型
+- 实现模型热切换：在对话中输入 `/model deepseek-chat` 切换模型
 
 ---
 

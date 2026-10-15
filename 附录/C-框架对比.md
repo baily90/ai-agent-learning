@@ -49,9 +49,10 @@ Vercel AI SDK 是一个专注于 AI 应用 UI 层的轻量级 SDK。它不试图
 ```typescript
 import { generateText, tool } from 'ai';
 import { z } from 'zod';
+import { openai } from '@ai-sdk/openai';
 
 const result = await generateText({
-  model: 'openai/gpt-5',
+  model: openai('gpt-5'),
   tools: {
     getWeather: tool({
       description: '获取城市天气',

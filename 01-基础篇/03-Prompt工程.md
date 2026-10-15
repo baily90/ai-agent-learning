@@ -605,7 +605,7 @@ Prompt 需要像代码一样**根据实际效果反复迭代**。盲目照搬就
 ```typescript
 // 不好——Prompt 硬编码在代码中
 const result = await generateText({
-  model: 'deepseek/deepseek-flash',
+  model: deepseek('deepseek-chat'),
   instructions: "你是一个专业的代码审查助手...",
   prompt: userInput,
 });
@@ -969,13 +969,14 @@ export const WEEKLY_REPORT_PROMPT = {
 ```typescript
 // app/api/chat/route.ts
 import { streamText, toUIMessageStream, createUIMessageStreamResponse } from "ai";
+import { deepseek } from "@ai-sdk/deepseek";
 import { WORK_ASSISTANT_PROMPT } from "@/prompts/work-assistant";
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
   const result = streamText({
-    model: "deepseek/deepseek-flash",
+    model: deepseek("deepseek-chat"),
     instructions: WORK_ASSISTANT_PROMPT.system,
     messages,
     maxOutputTokens: 2000,

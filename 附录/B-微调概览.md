@@ -234,9 +234,12 @@ GPT-5、Claude 5、DeepSeek V4 这些模型的通用能力已经非常强。很�
 - 自托管模型需要部署到 GPU 服务器上
 
 ```typescript
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+
 // 调用 Fine-tuned 模型——和调用标准模型完全一样
 const result = await generateText({
-  model: 'openai/ft:gpt-5-mini:my-org:my-model:abc123', // 微调后的模型 ID
+  model: openai('ft:gpt-5-mini:my-org:my-model:abc123'), // 微调后的模型 ID
   prompt: '请审查这段代码...',
 });
 ```

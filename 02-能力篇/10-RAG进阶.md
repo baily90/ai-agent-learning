@@ -983,6 +983,7 @@ RAGAS 评估的核心指标：
 // 进阶 RAG：混合检索 + Reranking
 
 import { generateText, embed } from 'ai';
+import { openai } from '@ai-sdk/openai';
 
 // =========================================
 // 1. BM25 关键词检索（简化实现）
@@ -1206,7 +1207,7 @@ export class AdvancedRAGService {
     // 向量索引（实际项目中用向量数据库）
     for (const doc of documents) {
       const { embedding } = await embed({
-        model: 'openai/text-embedding-3-small',
+        model: openai.embedding('text-embedding-3-small'),
         value: doc.text,
       });
       this.vectorStore.set(doc.id, {
@@ -1256,7 +1257,7 @@ export class AdvancedRAGService {
 
     // 2. 向量检索
     const { embedding: queryEmbedding } = await embed({
-      model: 'openai/text-embedding-3-small',
+      model: openai.embedding('text-embedding-3-small'),
       value: searchQuery,
     });
 
