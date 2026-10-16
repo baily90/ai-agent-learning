@@ -139,6 +139,8 @@ const messages = [
 ];
 ```
 
+> 注：这是底层消息协议的概念示意。在 AI SDK 7 里，system 内容通过 `instructions` 参数传入，不放在 `messages` 里（`messages` 只放 `user` / `assistant` 消息）。
+
 **角色优先级的微妙之处**
 
 很多教程会简单地说"system 优先级最高"，但实际情况更复杂。
