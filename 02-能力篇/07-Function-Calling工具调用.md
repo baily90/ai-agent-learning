@@ -1213,7 +1213,7 @@ main();
 
 ```typescript
 // app/api/chat/route.ts — Next.js API Route
-import { streamText, isStepCount, toUIMessageStream, createUIMessageStreamResponse } from 'ai';
+import { streamText, convertToModelMessages, isStepCount, toUIMessageStream, createUIMessageStreamResponse } from 'ai';
 import { deepseek } from '@ai-sdk/deepseek';
 import { getWeather, getCalendar, createTodo, webSearch } from '@/lib/tools';
 
@@ -1225,7 +1225,7 @@ export async function POST(req: Request) {
     instructions: '你是一个智能工作助手...',
     tools: { getWeather, getCalendar, createTodo, webSearch },
     stopWhen: isStepCount(5),
-    messages,
+    messages: await convertToModelMessages(messages),
   });
 
   return createUIMessageStreamResponse({
@@ -1238,10 +1238,31 @@ export async function POST(req: Request) {
 // app/page.tsx — React 前端
 'use client';
 
+import { useState, type FormEvent } from 'react';
 import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport, type UIMessage } from 'ai';
+
+// 从 v7 的 parts 数组中提取纯文本
+function messageText(message: UIMessage): string {
+  return message.parts
+    .map((part) => (part.type === 'text' ? part.text : ''))
+    .join('');
+}
 
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat();
+  const [input, setInput] = useState('');
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({ api: '/api/chat' }),
+  });
+  const isLoading = status === 'submitted' || status === 'streaming';
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const text = input.trim();
+    if (!text || isLoading) return;
+    sendMessage({ text });
+    setInput('');
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-4">
@@ -1253,30 +1274,32 @@ export default function Chat() {
             </div>
 
             {/* 展示文本内容 */}
-            {message.content && (
-              <div className="whitespace-pre-wrap">{message.content}</div>
+            {messageText(message) && (
+              <div className="whitespace-pre-wrap">{messageText(message)}</div>
             )}
 
-            {/* 展示工具调用状态 */}
-            {/* 注：toolInvocations 字段名可能随 AI SDK 版本微调，以当前 useChat 类型定义为准 */}
-            {message.toolInvocations?.map((toolInvocation) => (
-              <div key={toolInvocation.toolCallId} className="bg-gray-100 rounded p-3 text-sm">
-                <div className="font-medium text-gray-600">
-                  调用工具: {toolInvocation.toolName}
-                </div>
+            {/* 展示工具调用状态（v7 中工具调用位于 message.parts，类型为 dynamic-tool） */}
+            {message.parts.map((part) => {
+              if (part.type !== 'dynamic-tool') return null;
+              return (
+                <div key={part.toolCallId} className="bg-gray-100 rounded p-3 text-sm">
+                  <div className="font-medium text-gray-600">
+                    调用工具: {part.toolName}
+                  </div>
 
-                {/* 工具正在执行 */}
-                {'result' in toolInvocation ? (
-                  <div className="mt-1 text-green-700">
-                    结果: {JSON.stringify(toolInvocation.result, null, 2)}
-                  </div>
-                ) : (
-                  <div className="mt-1 text-yellow-600 animate-pulse">
-                    执行中...
-                  </div>
-                )}
-              </div>
-            ))}
+                  {/* 工具已完成，展示结果 */}
+                  {part.state === 'output-available' ? (
+                    <div className="mt-1 text-green-700">
+                      结果: {JSON.stringify(part.output, null, 2)}
+                    </div>
+                  ) : (
+                    <div className="mt-1 text-yellow-600 animate-pulse">
+                      执行中...
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
@@ -1284,7 +1307,7 @@ export default function Chat() {
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input
           value={input}
-          onChange={handleInputChange}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="问我任何事情..."
           className="flex-1 border rounded px-3 py-2"
           disabled={isLoading}

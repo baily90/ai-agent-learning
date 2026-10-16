@@ -1409,7 +1409,7 @@ export function ApprovalFlow({
 
 ```typescript
 // app/api/agent-chat/route.ts
-import { streamText, tool } from 'ai';
+import { streamText, convertToModelMessages, isStepCount, toUIMessageStream, createUIMessageStreamResponse, tool } from 'ai';
 import { deepseek } from '@ai-sdk/deepseek';
 import { z } from 'zod';
 
@@ -1420,7 +1420,7 @@ export async function POST(req: Request) {
     model: deepseek('deepseek-chat'),
     instructions: `你是一个数据分析助手。当用户需要查看数据时，
 调用合适的工具来获取和展示数据。`,
-    messages,
+    messages: await convertToModelMessages(messages),
     tools: {
       queryData: tool({
         description: '查询业务数据',
@@ -1453,15 +1453,24 @@ export async function POST(req: Request) {
   });
 
   return createUIMessageStreamResponse({
-  stream: toUIMessageStream({ stream: result.stream }),
-});
+    stream: toUIMessageStream({ stream: result.stream }),
+  });
 }
 ```
 
 ```tsx
 // components/AgentChat.tsx
 'use client';
+import { useState, type FormEvent } from 'react';
 import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport, type UIMessage } from 'ai';
+
+// 从 v7 的 parts 数组中提取纯文本
+function messageText(message: UIMessage): string {
+  return message.parts
+    .map((part) => (part.type === 'text' ? part.text : ''))
+    .join('');
+}
 
 // 根据工具名渲染不同的 UI 组件
 function ToolResultRenderer({
@@ -1535,10 +1544,19 @@ function ToolResultRenderer({
 }
 
 export function AgentChat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/agent-chat',
-    stopWhen: isStepCount(5),
+  const [input, setInput] = useState('');
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({ api: '/api/agent-chat' }),
   });
+  const isLoading = status === 'submitted' || status === 'streaming';
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const text = input.trim();
+    if (!text || isLoading) return;
+    sendMessage({ text });
+    setInput('');
+  };
 
   return (
     <div className="flex flex-col h-screen max-w-3xl mx-auto">
@@ -1547,7 +1565,7 @@ export function AgentChat() {
         {messages.map((message) => (
           <div key={message.id}>
             {/* 普通文本消息 */}
-            {message.content && (
+            {messageText(message) && (
               <div
                 className={`p-3 rounded-lg ${
                   message.role === 'user'
@@ -1555,30 +1573,33 @@ export function AgentChat() {
                     : 'bg-gray-100 text-gray-800 max-w-[80%]'
                 }`}
               >
-                {message.content}
+                {messageText(message)}
               </div>
             )}
 
-            {/* 工具调用结果 */}
-            {message.toolInvocations?.map((invocation) => (
-              <div key={invocation.toolCallId}>
-                {/* 工具调用中 */}
-                {invocation.state === 'call' && (
-                  <div className="flex items-center gap-2 text-sm text-gray-500 my-2 animate-pulse">
-                    <span>🔧</span>
-                    <span>正在执行：{invocation.toolName}...</span>
-                  </div>
-                )}
+            {/* 工具调用结果（v7 中位于 message.parts，类型为 dynamic-tool） */}
+            {message.parts.map((part) => {
+              if (part.type !== 'dynamic-tool') return null;
+              return (
+                <div key={part.toolCallId}>
+                  {/* 工具调用中 */}
+                  {part.state !== 'output-available' && (
+                    <div className="flex items-center gap-2 text-sm text-gray-500 my-2 animate-pulse">
+                      <span>🔧</span>
+                      <span>正在执行：{part.toolName}...</span>
+                    </div>
+                  )}
 
-                {/* 工具调用完成，渲染自定义 UI */}
-                {invocation.state === 'result' && (
-                  <ToolResultRenderer
-                    toolName={invocation.toolName}
-                    result={invocation.result}
-                  />
-                )}
-              </div>
-            ))}
+                  {/* 工具调用完成，渲染自定义 UI */}
+                  {part.state === 'output-available' && (
+                    <ToolResultRenderer
+                      toolName={part.toolName}
+                      result={part.output}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         ))}
 
@@ -1596,7 +1617,7 @@ export function AgentChat() {
         <div className="flex gap-2">
           <input
             value={input}
-            onChange={handleInputChange}
+            onChange={(e) => setInput(e.target.value)}
             placeholder="输入你的问题..."
             className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={isLoading}
