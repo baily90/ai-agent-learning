@@ -233,6 +233,8 @@ GPT-5、Claude 5、DeepSeek V4 这些模型的通用能力已经非常强。很�
 - OpenAI 的微调模型直接通过 API 调用，和调用标准模型一模一样，只是模型名不同
 - 自托管模型需要部署到 GPU 服务器上
 
+> **注意**：Fine-tuning 示例以 OpenAI 为例，因为 **DeepSeek 目前不提供 Fine-tuning API**；其他提供商的微调流程类似，只是 API 不同。
+
 ```typescript
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';

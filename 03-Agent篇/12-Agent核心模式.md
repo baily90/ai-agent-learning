@@ -630,10 +630,10 @@ Level 3 → "高级"模式或开发者模式（完整思维链）
 对于需要确定性的 Agent，把 temperature 设置得尽可能低。
 
 ```typescript
-import { openai } from "@ai-sdk/openai";
+import { deepseek } from "@ai-sdk/deepseek";
 
 const result = await generateText({
-  model: openai('gpt-5'),
+  model: deepseek('deepseek-chat'),
   temperature: 0, // 最低随机性
   // ...
 });
@@ -860,7 +860,7 @@ Agent 越自主，就越不可控。这是一个根本性的张力：
 > 3. **格式遵从**：能稳定输出结构化的决策（如 JSON 格式的工具调用）
 > 4. **自我纠错**：能发现自己的错误并调整
 >
-> 实用建议：用强模型（如 GPT-5）做决策和推理，用小模型（如 GPT-5-mini）做简单执行步骤（摘要、格式转换等），组合使用来平衡效果和成本。
+> 实用建议：用强模型（如 `deepseek-reasoner`）做决策和推理，用快模型（如 `deepseek-chat`）做简单执行步骤（摘要、格式转换等），组合使用来平衡效果和成本。
 
 > **Q: 让 Agent "解释它为什么这样做"和让它"做得更好"，哪个更难？为什么？**
 
@@ -916,7 +916,7 @@ Agent 越自主，就越不可控。这是一个根本性的张力：
 
 ```typescript
 // simple-react-agent.ts
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
 
@@ -978,7 +978,7 @@ async function reactAgent(userMessage: string) {
   console.log('='.repeat(60));
   
   const result = await generateText({
-    model: openai('gpt-5'),
+    model: deepseek('deepseek-chat'),
     instructions: `你是一个智能助手 Agent。你可以使用提供的工具来完成用户的任务。
 
 请按照以下方式工作：
@@ -1031,7 +1031,7 @@ main();
 
 ```typescript
 // reflective-agent.ts
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
 
@@ -1073,7 +1073,7 @@ async function reflectiveAgent(userTask: string) {
     
     // 1. 推理：决定下一步做什么
     const thinkResult = await generateText({
-      model: openai('gpt-5'),
+      model: deepseek('deepseek-chat'),
       instructions: `你是一个智能 Agent。根据当前上下文，决定下一步行动。
 
 你必须以 JSON 格式回复：
@@ -1135,7 +1135,7 @@ async function reflectiveAgent(userTask: string) {
     
     // 3. 反思（每步都做）
     const reflectResult = await generateText({
-      model: openai('gpt-5-mini'), // 反思用小模型省成本
+      model: deepseek('deepseek-chat'), // 反思用小模型省成本
       instructions: '你是一个 Agent 的自省模块。评估上一步的执行质量，简短回答。',
       prompt: `任务: ${userTask}
 上一步思考: ${decision.thought}
@@ -1164,7 +1164,7 @@ async function reflectiveAgent(userTask: string) {
   // 如果达到步数上限还没完成
   if (!isComplete) {
     const summaryResult = await generateText({
-      model: openai('gpt-5'),
+      model: deepseek('deepseek-chat'),
       prompt: `${buildContext()}\n\n已达到最大步数限制。请根据目前收集到的信息，给出最好的回答。如果信息不足，请说明还缺少什么。`,
     });
     finalAnswer = summaryResult.text;
@@ -1189,7 +1189,7 @@ main();
 
 ```typescript
 // plan-execute-agent.ts
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
 
@@ -1207,7 +1207,7 @@ interface Plan {
 // 阶段 1：规划
 async function createPlan(userTask: string): Promise<Plan> {
   const result = await generateText({
-    model: openai('gpt-5'),
+    model: deepseek('deepseek-chat'),
     instructions: `你是一个任务规划专家。将用户的任务分解为具体的执行步骤。
 
 每个步骤需要指明：
@@ -1265,7 +1265,7 @@ async function executeStep(
   
   // 对于不需要工具的步骤（如分析、总结），用 LLM 执行
   const result = await generateText({
-    model: openai('gpt-5'),
+    model: deepseek('deepseek-chat'),
     instructions: '你是一个任务执行者。根据之前步骤的结果，执行当前步骤。',
     prompt: `任务目标: ${plan.goal}
 当前步骤: ${step.description}
@@ -1287,7 +1287,7 @@ async function replan(
   issue: string
 ): Promise<Plan> {
   const result = await generateText({
-    model: openai('gpt-5'),
+    model: deepseek('deepseek-chat'),
     instructions: '你是一个任务规划专家。根据执行中发现的问题，调整剩余计划。以 JSON 格式输出新的计划。',
     prompt: `原始计划: ${JSON.stringify(plan)}
 已完成步骤数: ${completedSteps}
@@ -1564,7 +1564,7 @@ export default function AgentChat() {
 
 ```typescript
 // app/api/agent/route.ts
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { streamText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
 
@@ -1572,7 +1572,7 @@ export async function POST(req: Request) {
   const { message } = await req.json();
   
   const result = streamText({
-    model: openai('gpt-5'),
+    model: deepseek('deepseek-chat'),
     instructions: `你是一个能自主完成任务的 AI Agent。
 
 你的工作方式：

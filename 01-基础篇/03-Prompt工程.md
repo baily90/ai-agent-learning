@@ -843,10 +843,12 @@ Prompt 的变更管理就是产品质量管理。
 
 在第2章中我们完成了基本的 API 调用。这一章，我们为"AI 智能工作助手"设计一套完整的 Prompt 体系。
 
+以下代码沿用第 2 章搭建的独立项目（`src/` 目录 + `npx tsx` 运行），新增文件都放在 `src/` 下。
+
 #### 1. System Prompt 模块化设计
 
 ```typescript
-// prompts/work-assistant.ts
+// src/prompts/work-assistant.ts
 
 // 基础身份定义
 const IDENTITY = `你是"小助手"，一个面向开发团队的 AI 工作助手。
@@ -923,7 +925,7 @@ export const CODE_REVIEW_PROMPT = {
 #### 2. Few-shot 示例驱动的 Prompt
 
 ```typescript
-// prompts/weekly-report.ts
+// src/prompts/weekly-report.ts
 
 export const WEEKLY_REPORT_PROMPT = {
   version: "1.0.0",
@@ -969,31 +971,41 @@ export const WEEKLY_REPORT_PROMPT = {
 #### 3. 用 Vercel AI SDK 实现完整的 Prompt 调用
 
 ```typescript
-// app/api/chat/route.ts
-import { streamText, toUIMessageStream, createUIMessageStreamResponse } from "ai";
+// src/chat.ts
+import 'dotenv/config';
+import { streamText } from "ai";
 import { deepseek } from "@ai-sdk/deepseek";
-import { WORK_ASSISTANT_PROMPT } from "@/prompts/work-assistant";
+import { WORK_ASSISTANT_PROMPT } from "./prompts/work-assistant";
 
-export async function POST(req: Request) {
-  const { messages } = await req.json();
-
+async function main() {
   const result = streamText({
     model: deepseek("deepseek-chat"),
     instructions: WORK_ASSISTANT_PROMPT.system,
-    messages,
+    messages: [{ role: "user", content: "帮我梳理一下下周技术方案评审的要点。" }],
     maxOutputTokens: 2000,
   });
 
-  return createUIMessageStreamResponse({
-    stream: toUIMessageStream({ stream: result.stream }),
-  });
+  // 在终端里逐字消费流式输出
+  for await (const textPart of result.textStream) {
+    process.stdout.write(textPart);
+  }
 }
+
+main();
 ```
+
+运行方式：
+
+```bash
+npx tsx src/chat.ts
+```
+
+> 注：这里用 `result.textStream` 在终端里消费流。等第 4 章讲前端集成时，才会改用 `app/api/chat/route.ts` 这样的 HTTP 路由 + `createUIMessageStreamResponse()` 把流返回给浏览器。
 
 #### 4. Few-shot 作为对话历史注入
 
 ```typescript
-// utils/build-messages.ts
+// src/utils/build-messages.ts
 import type { ModelMessage } from "ai";
 
 interface FewShotExample {
@@ -1027,7 +1039,7 @@ const messages = buildMessagesWithFewShot(
 #### 5. 带 CoT 的复杂分析 Prompt
 
 ```typescript
-// prompts/tech-decision.ts
+// src/prompts/tech-decision.ts
 
 export const TECH_DECISION_PROMPT = {
   version: "1.0.0",
@@ -1082,7 +1094,7 @@ export const TECH_DECISION_PROMPT = {
 - 建议场景：代码审查、周报生成、技术方案评审
 
 **Step 3：实现 Prompt 版本管理（20 分钟）**
-- 将所有 Prompt 抽取到独立的 `prompts/` 目录
+- 将所有 Prompt 抽取到独立的 `src/prompts/` 目录
 - 每个 Prompt 包含 `version` 字段
 - 写一个简单的 changelog
 

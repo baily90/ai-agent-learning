@@ -354,10 +354,10 @@ messages: [
 
 ```typescript
 import { generateText, isStepCount } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 
 const result = await generateText({
-  model: openai('gpt-5'),
+  model: deepseek('deepseek-chat'),
   tools: { getWeather: weatherTool },
   stopWhen: isStepCount(5),  // 最多循环 5 次
   prompt: '北京今天天气怎么样？',
@@ -388,11 +388,11 @@ console.log(result.steps); // 调试用：查看完整的调用链
 
 ```typescript
 import { generateText, tool, isStepCount } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { z } from 'zod';
 
 const result = await generateText({
-  model: openai('gpt-5'),
+  model: deepseek('deepseek-chat'),
   tools: {
     // 工具 1：查天气
     getWeather: tool({
@@ -631,10 +631,10 @@ Tool Call Loop 可以多轮执行——AI 调工具 → 看结果 → 再调工�
 3. **响应时间爆炸**：每轮都有网络延迟，10 轮循环可能让用户等 30 秒以上
 
 ```typescript
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 
 const result = await generateText({
-  model: openai('gpt-5'),
+  model: deepseek('deepseek-chat'),
   tools: { /* ... */ },
   stopWhen: isStepCount(5),  // 最多 5 个步骤（包括工具调用和最终回复）
   prompt: '...',
@@ -662,10 +662,10 @@ const result = await generateText({
 
 ```typescript
 // 还可以监听每一步的执行，做日志或中断
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 
 const result = await generateText({
-  model: openai('gpt-5'),
+  model: deepseek('deepseek-chat'),
   tools: { /* ... */ },
   stopWhen: isStepCount(10),
   onStepEnd: ({ text, toolCalls, toolResults, finishReason, usage }) => {

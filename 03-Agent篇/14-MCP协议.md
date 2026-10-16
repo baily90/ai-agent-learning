@@ -809,7 +809,7 @@ export async function mcpToolsToAiSdkTools(client: Client) {
 
 ```typescript
 // app/api/chat/route.ts — 在 API 路由中使用
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { streamText, isStepCount, toUIMessageStream, createUIMessageStreamResponse } from 'ai';
 import { createMcpClient } from '@/lib/mcp-client';
 import { mcpToolsToAiSdkTools } from '@/lib/mcp-to-ai-sdk';
@@ -832,7 +832,7 @@ export async function POST(req: Request) {
   const { messages } = await req.json();
 
   const result = streamText({
-    model: openai('gpt-5'),
+    model: deepseek('deepseek-chat'),
     messages,
     tools: {
       // 你原来的硬编码工具
@@ -1414,7 +1414,7 @@ export async function DELETE(req: Request) {
 
 ```typescript
 // app/api/chat/route.ts — 集成 MCP 工具的聊天 API
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { streamText, isStepCount, toUIMessageStream, createUIMessageStreamResponse } from 'ai';
 import { mcpManager } from '@/lib/mcp-manager';
 
@@ -1425,7 +1425,7 @@ export async function POST(req: Request) {
   const mcpTools = await mcpManager.getAiSdkTools();
 
   const result = streamText({
-    model: openai('gpt-5'),
+    model: deepseek('deepseek-chat'),
     instructions: `你是一个智能工作助手。你可以使用以下工具来帮助用户完成任务。
 工具名格式为"server名__工具名"，调用时选择最合适的工具。`,
     messages,

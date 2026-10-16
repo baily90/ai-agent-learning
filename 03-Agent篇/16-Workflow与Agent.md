@@ -533,7 +533,7 @@ LangChain 团队现在的产品分层非常清晰，别再把 LangGraph 当成 L
 
 **关键点**：LangGraph 是**底层编排框架**，它不抽象 prompt、不抽象 Agent 架构，只负责「把步骤组织成图并可靠地运行」。而且**你可以不用 LangChain 单独用 LangGraph**。
 
-### 代码实战：Hello World + 一个混合工作流
+### LangGraph 示例：Hello World + 一个混合工作流
 
 安装：
 
@@ -803,7 +803,7 @@ type Intent = z.infer<typeof IntentSchema>;
 
 ```typescript
 // workflow/assistant-workflow.ts
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, Output, tool, isStepCount } from 'ai';
 import { z } from 'zod';
 
@@ -814,7 +814,7 @@ import { z } from 'zod';
 // 节点1：意图分类（LLM 节点，但输出是结构化的）
 async function classifyIntent(userMessage: string): Promise<Intent> {
   const { output } = await generateText({
-    model: openai('gpt-5-mini'),  // 分类用小模型就够了
+    model: deepseek('deepseek-chat'),  // 分类用小模型就够了
     instructions: `你是一个意图分类器。将用户的消息分类为以下类别之一：
       - schedule: 涉及日程、会议、提醒、日历
       - knowledge: 提问、查询信息、寻求解释
@@ -840,7 +840,7 @@ async function handleSchedule(message: string, entities: Intent['extractedEntiti
       const events = await queryCalendar(entities.datetime);
       // 用 LLM 将结构化数据转为自然语言
       const { text } = await generateText({
-        model: openai('gpt-5-mini'),
+        model: deepseek('deepseek-chat'),
         instructions: '将日程数据转换为友好的自然语言描述。',
         prompt: `用户问: ${message}\n日程数据: ${JSON.stringify(events)}`,
       });
@@ -877,7 +877,7 @@ async function handleKnowledge(message: string) {
   
   // 步骤2：基于文档生成回答（LLM 节点）
   const { text } = await generateText({
-    model: openai('gpt-5'),  // 知识问答用更强的模型
+    model: deepseek('deepseek-chat'),  // 知识问答用更强的模型
     instructions: `基于以下参考文档回答用户问题。
       如果文档中没有相关信息，坦率地说"我在知识库中没有找到相关信息"。
       不要编造信息。`,
@@ -895,7 +895,7 @@ async function handleKnowledge(message: string) {
 // 写作任务多种多样，很难预定义所有路径
 async function handleWriting(message: string) {
   const { text } = await generateText({
-    model: openai('gpt-5'),
+    model: deepseek('deepseek-chat'),
     instructions: `你是一个写作助手。你可以帮用户：
       - 写邮件（商务/正式/随意）
       - 写报告摘要
@@ -1027,7 +1027,7 @@ async function handleTask(message: string, entities: any) {
 
 async function handleGeneral(message: string) {
   const { text } = await generateText({
-    model: openai('gpt-5-mini'),
+    model: deepseek('deepseek-chat'),
     instructions: '你是一个友好的工作助手。回答用户的一般性问题。',
     prompt: message,
   });

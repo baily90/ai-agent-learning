@@ -979,11 +979,11 @@ RAGAS 评估的核心指标：
 ### 混合检索 + Reranking 完整实现
 
 ```typescript
-// src/advanced-rag.ts
+// lib/advanced-rag.ts
 // 进阶 RAG：混合检索 + Reranking
 
 import { generateText, embed } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { openai } from '@ai-sdk/openai'; // Embedding：DeepSeek 无 Embedding 模型，用 OpenAI
 
 // =========================================
 // 1. BM25 关键词检索（简化实现）
@@ -1348,7 +1348,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 ### 使用示例
 
 ```typescript
-// src/demo.ts
+// lib/demo.ts
 import { AdvancedRAGService } from './advanced-rag';
 
 async function main() {
@@ -1410,7 +1410,7 @@ main().catch(console.error);
 ### Query 优化：HyDE 实现
 
 ```typescript
-// src/hyde.ts
+// lib/hyde.ts
 // HyDE（Hypothetical Document Embedding）实现
 
 import { generateText, embed } from 'ai';
@@ -1476,7 +1476,7 @@ async function compareSearchMethods(query: string) {
 ### 简单的 RAG 评估脚本
 
 ```typescript
-// src/evaluate.ts
+// lib/evaluate.ts
 // 简单的 RAG 评估——计算 Recall@K 和 MRR
 
 interface TestCase {

@@ -697,7 +697,7 @@ interface AgentResult {
 
 ```typescript
 // agents/specialist-agents.ts
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
 
@@ -705,7 +705,7 @@ import { z } from 'zod';
 async function refundAgent(input: string, context?: Record<string, any>): Promise<AgentResult> {
   const { text } = await generateText({
     // 执行型 Agent 用性价比高的小模型
-    model: openai('gpt-5-mini'),
+    model: deepseek('deepseek-chat'),
     instructions: `你是一个退款处理专家。你的职责是：
       1. 查询订单信息
       2. 判断是否符合退款条件（7天无理由，商品未损坏）
@@ -755,7 +755,7 @@ async function refundAgent(input: string, context?: Record<string, any>): Promis
 // 技术支持 Agent
 async function techAgent(input: string, context?: Record<string, any>): Promise<AgentResult> {
   const { text } = await generateText({
-    model: openai('gpt-5-mini'),
+    model: deepseek('deepseek-chat'),
     instructions: `你是一个技术支持专家。你的职责是：
       1. 诊断用户遇到的技术问题
       2. 提供分步解决方案
@@ -790,7 +790,7 @@ async function techAgent(input: string, context?: Record<string, any>): Promise<
 // 通用咨询 Agent
 async function generalAgent(input: string, context?: Record<string, any>): Promise<AgentResult> {
   const { text } = await generateText({
-    model: openai('gpt-5-mini'),
+    model: deepseek('deepseek-chat'),
     instructions: `你是一个友好的客服助手。处理一般性咨询，包括：
       - 产品介绍和推荐
       - 物流查询
@@ -812,7 +812,7 @@ export { refundAgent, techAgent, generalAgent };
 
 ```typescript
 // agents/orchestrator.ts
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
 import { refundAgent, techAgent, generalAgent } from './specialist-agents';
@@ -828,7 +828,7 @@ async function orchestrate(userMessage: string): Promise<string> {
   // 第一步：经理 Agent 分析用户意图并路由
   // 注意这里用更强的模型，因为路由决策很关键
   const { text: routingDecision } = await generateText({
-    model: openai('gpt-5'),
+    model: deepseek('deepseek-chat'),
     instructions: `你是一个客服团队的经理。你的职责是分析用户问题并分配给合适的专家处理。
 
 可用的专家团队：
@@ -896,7 +896,7 @@ main();
 
 ```typescript
 // pipeline/content-review.ts
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, Output, isStepCount } from 'ai';
 import { z } from 'zod';
 
@@ -911,7 +911,7 @@ const contentAnalyzer: PipelineStage<string, { summary: string; topics: string[]
   name: 'content-analyzer',
   execute: async (content) => {
     const { output } = await generateText({
-      model: openai('gpt-5-mini'),
+      model: deepseek('deepseek-chat'),
       instructions: '你是一个内容分析专家。分析给定内容的主题、摘要和情感倾向。',
       output: Output.object({
         schema: z.object({
@@ -934,7 +934,7 @@ const safetyReviewer: PipelineStage<
   name: 'safety-reviewer',
   execute: async ({ content, analysis }) => {
     const { output } = await generateText({
-      model: openai('gpt-5-mini'),
+      model: deepseek('deepseek-chat'),
       instructions: `你是一个内容安全审核专家。检查内容是否包含：
         - 暴力或仇恨言论
         - 虚假信息
@@ -960,7 +960,7 @@ const qualityScorer: PipelineStage<
   name: 'quality-scorer',
   execute: async ({ content, analysis, safety }) => {
     const { output } = await generateText({
-      model: openai('gpt-5-mini'),
+      model: deepseek('deepseek-chat'),
       instructions: '你是一个内容质量评审专家。从原创性、准确性、可读性三个维度评分。',
       output: Output.object({
         schema: z.object({
@@ -1016,7 +1016,7 @@ async function runContentPipeline(content: string) {
 
 ```typescript
 // debate/code-review.ts
-import { openai } from '@ai-sdk/openai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, Output, isStepCount } from 'ai';
 import { z } from 'zod';
 
@@ -1036,7 +1036,7 @@ async function debateCodeReview(code: string) {
   const [securityReview, performanceReview, maintainabilityReview] = await Promise.all([
     // 安全视角
     generateText({
-      model: openai('gpt-5-mini'),
+      model: deepseek('deepseek-chat'),
       instructions: `你是一个安全审查专家。从安全角度审查代码：
         - SQL 注入、XSS、CSRF 风险
         - 敏感信息泄露
@@ -1047,7 +1047,7 @@ async function debateCodeReview(code: string) {
     }),
     // 性能视角
     generateText({
-      model: openai('gpt-5-mini'),
+      model: deepseek('deepseek-chat'),
       instructions: `你是一个性能优化专家。从性能角度审查代码：
         - 不必要的重复计算
         - 内存泄漏风险
@@ -1058,7 +1058,7 @@ async function debateCodeReview(code: string) {
     }),
     // 可维护性视角
     generateText({
-      model: openai('gpt-5-mini'),
+      model: deepseek('deepseek-chat'),
       instructions: `你是一个代码质量专家。从可维护性角度审查代码：
         - 命名规范
         - 函数复杂度

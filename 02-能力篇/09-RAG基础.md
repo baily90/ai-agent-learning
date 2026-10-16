@@ -781,7 +781,7 @@ npm install -D typescript tsx @types/node
 ### 第一步：文档准备与分块
 
 ```typescript
-// src/chunker.ts
+// lib/chunker.ts
 // 简单的文本分块器——按固定大小分块，带重叠
 
 interface Chunk {
@@ -863,7 +863,7 @@ async function indexDocuments() {
   const chroma = new ChromaClient();
 
   // 2. 创建 Embedding 函数
-  // 这里用 OpenAI 的 Embedding 模型，你也可以换成其他的
+  // Embedding 用 OpenAI 的模型（DeepSeek 没有 Embedding API，你也可以换成其他 Embedding 服务）
   const embedder = new OpenAIEmbeddingFunction({
     openai_api_key: process.env.OPENAI_API_KEY!,
     openai_model: 'text-embedding-3-small',
@@ -918,7 +918,7 @@ indexDocuments().catch(console.error);
 ### 第三步：检索 + 生成回答
 
 ```typescript
-// src/rag-query.ts
+// lib/rag-query.ts
 // 完整的 RAG 查询流程
 
 import { generateText } from 'ai';
@@ -1003,7 +1003,7 @@ main().catch(console.error);
 ### 第四步：封装成可复用的 RAG 服务
 
 ```typescript
-// src/rag-service.ts
+// lib/rag-service.ts
 // 封装一个可复用的 RAG 服务类
 
 import { generateText, streamText } from 'ai';
