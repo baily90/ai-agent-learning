@@ -910,12 +910,15 @@ Agent 越自主，就越不可控。这是一个根本性的张力：
 
 ## 代码实战
 
+> **项目归属**：实战 1~3 是**独立脚本**（`.ts` 文件，在第 2 章搭建的 ts 项目里用 `npx tsx` 运行，已加 `import 'dotenv/config'` 加载 `.env`），**不在 Next.js 主线项目里**；实战 4、实战 5 才是 Next.js 前后端集成（`app/components/` + `app/api/`）。
+
 ### 实战 1：最简 ReAct Agent
 
 用 Vercel AI SDK 实现一个最基础的 ReAct Agent。
 
 ```typescript
 // simple-react-agent.ts
+import 'dotenv/config';
 import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
@@ -1031,6 +1034,7 @@ main();
 
 ```typescript
 // reflective-agent.ts
+import 'dotenv/config';
 import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
@@ -1189,6 +1193,7 @@ main();
 
 ```typescript
 // plan-execute-agent.ts
+import 'dotenv/config';
 import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, tool, isStepCount } from 'ai';
 import { z } from 'zod';

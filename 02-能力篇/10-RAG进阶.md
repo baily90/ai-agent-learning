@@ -976,6 +976,8 @@ RAGAS 评估的核心指标：
 
 ## 代码实战
 
+> **项目归属**：本章代码是**独立 ts 项目脚本**（`lib/*.ts`，`npx tsx` 运行，已加 `import 'dotenv/config'` 加载 `.env`），**不在主线 Next.js 项目里**（可沿用第 9 章的 `rag-demo` 项目）。
+
 ### 混合检索 + Reranking 完整实现
 
 ```typescript
@@ -1349,6 +1351,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 
 ```typescript
 // lib/demo.ts
+import 'dotenv/config';
 import { AdvancedRAGService } from './advanced-rag';
 
 async function main() {

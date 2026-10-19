@@ -1027,6 +1027,8 @@ MCP（Model Context Protocol）就是试图标准化 Tool Use 的协议，我们
 
 ## 代码实战
 
+> **项目归属**：实战 1 是**独立脚本**（`tools.ts` + `agent.ts`，在第 2 章搭建的 ts 项目里用 `npx tsx` 运行，已加 `import 'dotenv/config'`），**不在 Next.js 主线项目里**；实战 2 是 Next.js 前后端集成（`app/api/` + `useChat`）；实战 3 只是工具定义片段（`deleteFile`），放进任一项目的 `tools/` 目录即可。
+
 ### 实战 1：完整的多工具 Agent
 
 我们来构建一个拥有多个工具的完整 Agent，展示 Tool Use 的完整流程。
@@ -1154,6 +1156,7 @@ export const webSearch = tool({
 
 ```typescript
 // agent.ts — 主程序
+import 'dotenv/config';
 import { generateText, isStepCount } from 'ai';
 import { deepseek } from '@ai-sdk/deepseek';
 import { getWeather, getCalendar, createTodo, webSearch } from './tools';

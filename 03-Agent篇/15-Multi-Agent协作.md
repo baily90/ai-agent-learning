@@ -673,6 +673,8 @@ Orchestrator 是一种 Agent 模式——由 LLM 动态决定任务分配。Work
 
 ## 代码实战
 
+> **项目归属**：本章全是**独立脚本**（`agents/*.ts`、`pipeline/*.ts`、`debate/*.ts`，在第 2 章搭建的 ts 项目里用 `npx tsx` 运行，入口脚本已加 `import 'dotenv/config'` 加载 `.env`），**不在 Next.js 主线项目里**。
+
 我们用 Vercel AI SDK 实现一个简单的 Multi-Agent 客服系统：一个 Orchestrator Agent 指挥三个专业 Agent。
 
 ### 定义专业 Agent
@@ -812,6 +814,7 @@ export { refundAgent, techAgent, generalAgent };
 
 ```typescript
 // agents/orchestrator.ts
+import 'dotenv/config';
 import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
@@ -896,6 +899,7 @@ main();
 
 ```typescript
 // pipeline/content-review.ts
+import 'dotenv/config';
 import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, Output, isStepCount } from 'ai';
 import { z } from 'zod';
@@ -1016,6 +1020,7 @@ async function runContentPipeline(content: string) {
 
 ```typescript
 // debate/code-review.ts
+import 'dotenv/config';
 import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, Output, isStepCount } from 'ai';
 import { z } from 'zod';

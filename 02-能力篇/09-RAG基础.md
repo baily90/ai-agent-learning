@@ -766,6 +766,8 @@ chunk 3:             [CCCC|DDDD]
 
 ## 代码实战
 
+> **项目归属**：本章代码实战**独立建一个 `rag-demo` 项目**（ts 项目，`npx tsx` 运行，脚本已加 `import 'dotenv/config'` 加载 `.env`），**不在主线 Next.js 项目里**；最后一节「在 Next.js API Route 中使用」才接入 Next.js。
+
 下面我们用 TypeScript + Vercel AI SDK 搭建一个最简单的 RAG 系统。
 
 ### 准备工作
@@ -855,6 +857,7 @@ chunks.forEach(c => console.log(`[${c.id}] ${c.text.slice(0, 50)}...`));
 // src/indexer.ts
 // 把文档 chunk 向量化并存入 Chroma
 
+import 'dotenv/config';
 import { ChromaClient, OpenAIEmbeddingFunction } from 'chromadb';
 import { splitTextIntoChunks } from './chunker';
 
@@ -921,6 +924,7 @@ indexDocuments().catch(console.error);
 // lib/rag-query.ts
 // 完整的 RAG 查询流程
 
+import 'dotenv/config';
 import { generateText } from 'ai';
 import { deepseek } from '@ai-sdk/deepseek';
 import { ChromaClient, OpenAIEmbeddingFunction } from 'chromadb';
