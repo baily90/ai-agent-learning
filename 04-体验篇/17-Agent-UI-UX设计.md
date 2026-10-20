@@ -1027,6 +1027,8 @@ A：移动端 Agent UI 需要在三个维度上做根本性的重新设计：
 
 ## 代码实战
 
+> **项目归属**：本节三个实战都在**主线 Next.js 项目**里。`types/agent-ui.ts` 放在项目根目录的 `types/` 下（这样 `@/types/agent-ui` 能解析），`components/AgentThoughtChain.tsx`、`components/ApprovalFlow.tsx`、`components/AgentChat.tsx` 放在 `components/`，`app/api/agent-chat/route.ts` 放在对应目录。
+
 ### 实战1：思维链与工具调用可视化组件
 
 一个完整的 Agent 执行过程展示组件，包含思维链、工具调用和进度指示：
@@ -1219,7 +1221,7 @@ export function AgentThoughtChain({
 ```tsx
 // components/ApprovalFlow.tsx
 'use client';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 interface PendingAction {
   id: string;
@@ -1227,7 +1229,7 @@ interface PendingAction {
   title: string;           // 要做什么
   reason: string;          // 为什么要做
   impact: string;          // 影响是什么
-  preview?: React.ReactNode; // 结果预览
+  preview?: ReactNode;     // 结果预览
   autoApprove: boolean;    // 是否可以自动执行
 }
 

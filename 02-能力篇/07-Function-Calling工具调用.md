@@ -1027,7 +1027,7 @@ MCP（Model Context Protocol）就是试图标准化 Tool Use 的协议，我们
 
 ## 代码实战
 
-> **项目归属**：实战 1 是**独立脚本**（`tools.ts` + `agent.ts`，在第 2 章搭建的 ts 项目里用 `npx tsx` 运行，已加 `import 'dotenv/config'`），**不在 Next.js 主线项目里**；实战 2 是 Next.js 前后端集成（`app/api/` + `useChat`）；实战 3 只是工具定义片段（`deleteFile`），放进任一项目的 `tools/` 目录即可。
+> **项目归属**：实战 1 是**独立脚本**（`tools.ts` + `agent.ts`，在第 2 章搭建的 ts 项目里用 `npx tsx` 运行，已加 `import 'dotenv/config'`），**不在 Next.js 主线项目里**；实战 2 是 Next.js 前后端集成（`app/api/` + `useChat`）；实战 3 也是独立脚本（`deleteFile` 的两步确认删除演示，`npx tsx` 运行，不调 LLM、无需 API Key）。
 
 ### 实战 1：完整的多工具 Agent
 
@@ -1336,6 +1336,16 @@ export default function Chat() {
 
 import { tool } from 'ai';
 import { z } from 'zod';
+import { stat, unlink, writeFile } from 'node:fs/promises';
+
+// 查询文件信息（用于确认前的展示）
+async function getFileInfo(filePath: string) {
+  const info = await stat(filePath);
+  return {
+    size: info.size,
+    modifiedAt: info.mtime.toISOString(),
+  };
+}
 
 // 方案：将工具分为"查询"和"确认执行"两步
 export const deleteFile = tool({
@@ -1358,7 +1368,7 @@ export const deleteFile = tool({
     }
 
     // 确认后执行删除
-    await fs.unlink(filePath);
+    await unlink(filePath);
     return {
       success: true,
       needsConfirmation: false,
@@ -1366,6 +1376,23 @@ export const deleteFile = tool({
     };
   },
 });
+
+// 演示：确认 → 删除 两步流程
+async function main() {
+  // 先创建一个临时文件用于演示
+  await writeFile('demo.txt', '这是一个用于演示删除的文件');
+  console.log('已创建临时文件 demo.txt\n');
+
+  // 第一次调用：未确认，只返回文件信息
+  const first = await deleteFile.execute({ filePath: 'demo.txt' });
+  console.log('第一次调用:', first.message, '\n');
+
+  // 第二次调用：确认后真正删除
+  const second = await deleteFile.execute({ filePath: 'demo.txt', confirmed: true });
+  console.log('第二次调用:', second.message);
+}
+
+main().catch(console.error);
 ```
 
 ---

@@ -681,16 +681,15 @@ Orchestrator 是一种 Agent 模式——由 LLM 动态决定任务分配。Work
 
 ```typescript
 // agents/types.ts
-import { ModelMessage } from 'ai';
 
 // 每个 Agent 的标准接口——输入输出都有类型约束
-interface AgentConfig {
+export interface AgentConfig {
   name: string;
   systemPrompt: string;
   tools?: Record<string, any>;
 }
 
-interface AgentResult {
+export interface AgentResult {
   agent: string;
   response: string;
   metadata?: Record<string, any>;
@@ -702,6 +701,7 @@ interface AgentResult {
 import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
+import type { AgentResult } from './types';
 
 // 退款处理 Agent
 async function refundAgent(input: string, context?: Record<string, any>): Promise<AgentResult> {
@@ -816,9 +816,9 @@ export { refundAgent, techAgent, generalAgent };
 // agents/orchestrator.ts
 import 'dotenv/config';
 import { deepseek } from '@ai-sdk/deepseek';
-import { generateText, tool, isStepCount } from 'ai';
-import { z } from 'zod';
+import { generateText } from 'ai';
 import { refundAgent, techAgent, generalAgent } from './specialist-agents';
+import type { AgentResult } from './types';
 
 // Agent 注册表——方便扩展新 Agent
 const agentRegistry: Record<string, (input: string, context?: any) => Promise<AgentResult>> = {
@@ -901,7 +901,7 @@ main();
 // pipeline/content-review.ts
 import 'dotenv/config';
 import { deepseek } from '@ai-sdk/deepseek';
-import { generateText, Output, isStepCount } from 'ai';
+import { generateText, Output } from 'ai';
 import { z } from 'zod';
 
 // Pipeline 中每个节点的标准接口
@@ -1014,6 +1014,15 @@ async function runContentPipeline(content: string) {
     quality,
   };
 }
+
+// 运行
+async function main() {
+  await runContentPipeline(
+    '我们公司最新推出的智能手表，采用全新的健康监测芯片，续航长达两周，是市场上性价比最高的产品。'
+  );
+}
+
+main();
 ```
 
 ### Debate 模式：多角度代码审查
@@ -1022,7 +1031,7 @@ async function runContentPipeline(content: string) {
 // debate/code-review.ts
 import 'dotenv/config';
 import { deepseek } from '@ai-sdk/deepseek';
-import { generateText, Output, isStepCount } from 'ai';
+import { generateText, Output } from 'ai';
 import { z } from 'zod';
 
 const reviewSchema = z.object({
@@ -1101,6 +1110,21 @@ async function debateCodeReview(code: string) {
     issues: allIssues,
   };
 }
+
+// 运行
+async function main() {
+  const sampleCode = `
+function getUserOrders(userId) {
+  const sql = "SELECT * FROM orders WHERE user_id = " + userId;
+  return db.query(sql);
+}
+`;
+  const result = await debateCodeReview(sampleCode);
+  console.log('评分:', result.scores);
+  console.log('问题:', JSON.stringify(result.issues, null, 2));
+}
+
+main();
 ```
 
 这段代码展示了 Debate 模式的精髓：**三个 Agent 用 `Promise.all` 并行执行**，各自从不同角度审查代码，最后汇总意见并按优先级排序。注意不同维度有不同的权重——安全问题权重最高（0.4）。

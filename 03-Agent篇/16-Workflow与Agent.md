@@ -766,6 +766,8 @@ Pipeline 是 Workflow 的特例（没有分支的 Workflow）。Chain 是 Pipeli
 
 我们来实现一个混合架构的智能工作助手：外层 Workflow 控制整体流程，内层在需要灵活性的地方使用 Agent。
 
+> **项目归属**：本节是**独立脚本**，`workflow/types.ts`、`workflow/assistant-workflow.ts`、`workflow/visualize.ts` 都放在第 2 章搭建的 ts 项目里，入口脚本 `assistant-workflow.ts` 已加 `import 'dotenv/config'`，用 `npx tsx workflow/assistant-workflow.ts` 运行（不在 Next.js 主线项目里）。
+
 ### 定义 Workflow 节点
 
 ```typescript
@@ -773,14 +775,14 @@ Pipeline 是 Workflow 的特例（没有分支的 Workflow）。Chain 是 Pipeli
 import { z } from 'zod';
 
 // Workflow 的每个节点有明确的类型定义
-interface WorkflowNode<TInput, TOutput> {
+export interface WorkflowNode<TInput, TOutput> {
   name: string;
   type: 'code' | 'llm' | 'agent';  // 节点类型：纯代码 / LLM 调用 / Agent
   execute: (input: TInput) => Promise<TOutput>;
 }
 
 // 用户意图分类的输出 schema
-const IntentSchema = z.object({
+export const IntentSchema = z.object({
   category: z.enum([
     'schedule',       // 日程管理
     'knowledge',      // 知识问答
@@ -796,16 +798,18 @@ const IntentSchema = z.object({
   }),
 });
 
-type Intent = z.infer<typeof IntentSchema>;
+export type Intent = z.infer<typeof IntentSchema>;
 ```
 
 ### 实现混合架构
 
 ```typescript
 // workflow/assistant-workflow.ts
+import 'dotenv/config';
 import { deepseek } from '@ai-sdk/deepseek';
 import { generateText, Output, tool, isStepCount } from 'ai';
 import { z } from 'zod';
+import { IntentSchema, type Intent } from './types';
 
 // ============================================
 // 第一层：Workflow 节点（确定性流程）
@@ -1033,6 +1037,25 @@ async function handleGeneral(message: string) {
   });
   return text;
 }
+
+// 运行
+async function main() {
+  const questions = [
+    '帮我明天下午3点安排一个产品评审会',
+    '什么是 React Server Components？',
+    '帮我写一封给客户的商务邮件',
+  ];
+
+  for (const q of questions) {
+    console.log(`\n用户: ${q}`);
+    console.log('-'.repeat(50));
+    const answer = await assistantWorkflow(q);
+    console.log(`回复: ${answer}`);
+    console.log('='.repeat(50));
+  }
+}
+
+main();
 ```
 
 ### 关键设计决策说明
@@ -1106,7 +1129,7 @@ function printWorkflowTrace(trace: WorkflowTrace) {
 //
 // 1. [LLM] 意图分类
 //    耗时: 380ms
-//    模型: gpt-5-mini
+//    模型: deepseek-chat
 //    Token: 150
 //
 // 2. [代码] 路由分发
@@ -1114,7 +1137,7 @@ function printWorkflowTrace(trace: WorkflowTrace) {
 //
 // 3. [Agent] 写作辅助
 //    耗时: 1959ms
-//    模型: gpt-5
+//    模型: deepseek-chat
 //    Token: 1100
 ```
 

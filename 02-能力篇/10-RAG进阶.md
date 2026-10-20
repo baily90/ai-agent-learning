@@ -978,6 +978,8 @@ RAGAS 评估的核心指标：
 
 > **项目归属**：本章代码是**独立 ts 项目脚本**（`lib/*.ts`，`npx tsx` 运行，已加 `import 'dotenv/config'` 加载 `.env`），**不在主线 Next.js 项目里**（可沿用第 9 章的 `rag-demo` 项目）。
 
+> **依赖**：本章 Embedding 用 OpenAI 模型（DeepSeek 无 Embedding 模型），需额外安装 `@ai-sdk/openai`：`npm i @ai-sdk/openai`（其余依赖沿用第 9 章）。
+
 ### 混合检索 + Reranking 完整实现
 
 ```typescript
@@ -985,6 +987,8 @@ RAGAS 评估的核心指标：
 // 进阶 RAG：混合检索 + Reranking
 
 import { generateText, embed } from 'ai';
+import type { LanguageModel } from 'ai';
+import { deepseek } from '@ai-sdk/deepseek';
 import { openai } from '@ai-sdk/openai'; // Embedding：DeepSeek 无 Embedding 模型，用 OpenAI
 
 // =========================================
@@ -1134,7 +1138,7 @@ function reciprocalRankFusion(
 async function rerank(
   query: string,
   candidates: RankedResult[],
-  model: string,
+  model: LanguageModel,
   topK: number = 5
 ): Promise<RankedResult[]> {
   // 用 LLM 对每个候选打相关性分数
@@ -1171,9 +1175,6 @@ ${candidates.map((c, i) => `[${i}] ${c.text.slice(0, 200)}`).join('\n\n')}
 // =========================================
 
 interface AdvancedRAGConfig {
-  embeddingApiKey: string;
-  llmApiKey: string;
-  llmBaseURL: string;
   llmModel: string;
   vectorTopK?: number;    // 向量检索候选数量
   bm25TopK?: number;      // BM25 检索候选数量
@@ -1227,7 +1228,7 @@ export class AdvancedRAGService {
     if (!this.config.enableQueryRewriting) return query;
 
     const { text } = await generateText({
-      model: this.config.llmModel,
+      model: deepseek(this.config.llmModel),
       instructions: `将用户的口语化查询改写为适合知识库检索的精确查询。
 只输出改写后的查询，不要其他内容。`,
       prompt: query,
@@ -1297,7 +1298,7 @@ export class AdvancedRAGService {
       finalResults = await rerank(
         searchQuery,
         fusedResults.slice(0, 20), // 取前 20 个重排序
-        this.config.llmModel,
+        deepseek(this.config.llmModel),
         this.config.finalTopK!
       );
     } else {
@@ -1319,7 +1320,7 @@ export class AdvancedRAGService {
       .join('\n---\n');
 
     const { text: answer } = await generateText({
-      model: this.config.llmModel,
+      model: deepseek(this.config.llmModel),
       instructions: `你是一个专业的知识库问答助手。
 请严格根据参考资料回答问题，引用来源编号。
 如果参考资料不足以回答问题，请如实说明。
@@ -1356,10 +1357,7 @@ import { AdvancedRAGService } from './advanced-rag';
 
 async function main() {
   const rag = new AdvancedRAGService({
-    embeddingApiKey: process.env.OPENAI_API_KEY!,
-    llmApiKey: process.env.DEEPSEEK_API_KEY!,
-    llmBaseURL: 'https://api.deepseek.com/v1',
-    llmModel: 'deepseek/deepseek-flash',
+    llmModel: 'deepseek-chat',
     vectorTopK: 20,
     bm25TopK: 20,
     finalTopK: 5,

@@ -835,8 +835,6 @@ export async function POST(req: Request) {
     model: deepseek('deepseek-chat'),
     messages: await convertToModelMessages(messages),
     tools: {
-      // 你原来的硬编码工具
-      getWeather: /* ... */,
       // MCP Server 提供的工具（动态加载）
       ...mcpTools,
     },
@@ -1216,6 +1214,8 @@ const response = {
 ### 实战：为 Agent 助手添加 MCP 热插拔能力
 
 我们来完善上面的代码，实现一个完整的 MCP 集成方案：用户可以在 UI 上添加、移除 MCP Server，Agent 会自动获取新工具。
+
+> **项目归属**：本节代码分两部分。14.5 里的笔记 MCP Server 是**独立的 `mcp-notes-server` 项目**，先 `npx tsc` 编译成 `dist/index.js`。下面从 `lib/mcp-manager.ts` 开始的代码都在**主线 Next.js 项目**里——`lib/mcp-manager.ts`、`app/api/mcp/route.ts`、`app/api/chat/route.ts`、`components/McpServerPanel.tsx` 各自放在对应目录。想接入刚写的笔记 Server，把它加进面板的 `PRESET_SERVERS`（`command: 'node'`，`args: ['<绝对路径>/mcp-notes-server/dist/index.js']`）即可；面板里预置的 filesystem / github 只是两个示例。
 
 ```typescript
 // lib/mcp-manager.ts — 完整的 MCP 管理器

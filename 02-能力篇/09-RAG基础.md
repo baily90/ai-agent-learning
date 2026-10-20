@@ -186,7 +186,7 @@ Embedding 模型是一个独立的神经网络（注意：它不是大语言模�
 
 LLM（如 GPT-5、Claude）的任务是**生成文本**——输入一段话，输出下一段话。
 
-Embedding 模型（如 `text-embedding-3-small`、`bge-large`）的任务是**编码语义**——输入一段话，输出一个固定长度的数字向量。
+Embedding 模型（如 `qwen3.7-text-embedding-flash`、`bge-large`）的任务是**编码语义**——输入一段话，输出一个固定长度的数字向量。
 
 类比前端：LLM 像一个 React 组件的 `render()` 函数，输入 props 输出 JSX。Embedding 模型更像是 `JSON.stringify()`，把对象编码成一种方便比较和存储的格式。
 
@@ -198,10 +198,10 @@ Embedding 模型（如 `text-embedding-3-small`、`bge-large`）的任务是**�
 
 | 模型 | 维度 | 特点 |
 |------|------|------|
-| `text-embedding-3-small` (OpenAI) | 1536 | 性价比高，通用场景够用 |
-| `text-embedding-3-large` (OpenAI) | 3072 | 精度更高，适合高要求场景 |
+| `qwen3.7-text-embedding-flash` (通义千问) | 1024 | 轻量便宜，本章使用 |
+| `qwen3.7-text-embedding` (通义千问) | 1024 | 精度更高，可选更多维度 |
 | `bge-large-zh` (BAAI) | 1024 | 中文优化，开源免费 |
-| `text-embedding-ada-002` (OpenAI) | 1536 | 上一代，仍在广泛使用 |
+| `text-embedding-3-small` (OpenAI) | 1536 | 通用场景 |
 
 **3. 语义相似度 vs 关键词匹配——本质区别**
 
@@ -397,10 +397,10 @@ const chunks = ["chunk 1 的文本...", "chunk 2 的文本...", ...];
 const vectors = await Promise.all(
   chunks.map(chunk => embeddingModel.embed(chunk))
 );
-// vectors[0] = [0.023, -0.156, 0.891, ...] (1536 维)
+// vectors[0] = [0.023, -0.156, 0.891, ...] (1024 维)
 ```
 
-注意：**Embedding 是有成本的**。10 万个 chunk，每个 500 字，就是 5000 万字需要 Embedding。好消息是 Embedding 模型比 LLM 便宜得多——OpenAI 的 `text-embedding-3-small` 大约每百万 token 0.02 美元。
+注意：**Embedding 是有成本的**。10 万个 chunk，每个 500 字，就是 5000 万字需要 Embedding。好消息是 Embedding 模型比 LLM 便宜得多——千问的 `qwen3.7-text-embedding-flash` 大约每百万 token 0.125 元。
 
 ### 第四步：存入向量数据库（Indexing）
 
@@ -450,7 +450,7 @@ const results = await vectorDB.search({
 
 这里的 `topK` 参数很关键——K 太小可能漏掉相关内容，K 太大会引入噪音（不相关的内容混进去反而干扰 AI）。常见的经验值是 3-10。
 
-**关键细节：查询和文档必须用同一个 Embedding 模型。** 就像加密和解密必须用同一个算法一样，如果文档用 `text-embedding-3-small` 编码，查询也必须用这个模型。不同模型的向量空间不一样，混用会导致检索完全失效。
+**关键细节：查询和文档必须用同一个 Embedding 模型。** 就像加密和解密必须用同一个算法一样，如果文档用 `qwen3.7-text-embedding-flash` 编码，查询也必须用这个模型。不同模型的向量空间不一样，混用会导致检索完全失效。
 
 ### 第六步：生成回答（Generation）
 
@@ -712,7 +712,7 @@ chunk 3:             [CCCC|DDDD]
 >
 > **1. 分词问题**：英文单词之间有空格，天然分隔；中文字与字之间没有分隔符。"下载应用" 到底是 "下载/应用" 还是 "下/载/应/用"？分块时如果按字符数硬切，可能切断一个词。需要用分词工具（如 jieba）辅助。
 >
-> **2. Embedding 模型选择**：很多主流 Embedding 模型是英文语料训练的，对中文的语义理解可能不够好。建议选中文优化的模型：BGE 系列（BAAI 的开源模型）、M3E、text2vec-chinese 等。
+> **2. Embedding 模型选择**：很多主流 Embedding 模型是英文语料训练的，对中文的语义理解可能不够好。建议选中文优化的模型：通义千问 Embedding（阿里云百炼）、BGE 系列（BAAI 的开源模型）、M3E、text2vec-chinese 等。
 >
 > **3. Token 计算差异**：同样内容的中文文本，token 数量通常比英文多（因为中文字符在多数 tokenizer 中需要更多 token 来表示）。这意味着同样长度的中文文档，Embedding 和 LLM 的成本会更高。
 >
@@ -776,8 +776,15 @@ chunk 3:             [CCCC|DDDD]
 # 初始化项目
 mkdir rag-demo && cd rag-demo
 npm init -y
-npm install ai chromadb chromadb-default-embed
+npm install ai @ai-sdk/deepseek @ai-sdk/openai-compatible chromadb dotenv
 npm install -D typescript tsx @types/node
+```
+
+然后在项目根目录新建 `.env`，填入两个 Key（`QWEN_API_KEY` 是千问 Embedding 的 Key，`DEEPSEEK_API_KEY` 是 DeepSeek 大模型的 Key）：
+
+```text
+QWEN_API_KEY=sk-xxx        # 通义千问 Embedding（阿里云百炼 DashScope）
+DEEPSEEK_API_KEY=sk-xxx    # DeepSeek 大模型
 ```
 
 ### 第一步：文档准备与分块
@@ -854,31 +861,32 @@ chunks.forEach(c => console.log(`[${c.id}] ${c.text.slice(0, 50)}...`));
 ### 第二步：Embedding 与存入向量数据库
 
 ```typescript
-// src/indexer.ts
+// lib/indexer.ts
 // 把文档 chunk 向量化并存入 Chroma
 
 import 'dotenv/config';
-import { ChromaClient, OpenAIEmbeddingFunction } from 'chromadb';
+import { embed } from 'ai';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import { ChromaClient } from 'chromadb';
 import { splitTextIntoChunks } from './chunker';
+
+// 通义千问（阿里云百炼 DashScope）Embedding，走 OpenAI 兼容接口
+const dashscope = createOpenAICompatible({
+  name: 'dashscope',
+  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  apiKey: process.env.QWEN_API_KEY,
+});
 
 async function indexDocuments() {
   // 1. 连接 Chroma（本地运行）
   const chroma = new ChromaClient();
 
-  // 2. 创建 Embedding 函数
-  // Embedding 用 OpenAI 的模型（DeepSeek 没有 Embedding API，你也可以换成其他 Embedding 服务）
-  const embedder = new OpenAIEmbeddingFunction({
-    openai_api_key: process.env.OPENAI_API_KEY!,
-    openai_model: 'text-embedding-3-small',
-  });
-
-  // 3. 创建或获取 collection（类似数据库的表）
+  // 2. 创建或获取 collection（类似数据库的表）
   const collection = await chroma.getOrCreateCollection({
     name: 'company-docs',
-    embeddingFunction: embedder,
   });
 
-  // 4. 准备文档
+  // 3. 准备文档
   const documents = [
     {
       source: 'refund-policy',
@@ -900,17 +908,24 @@ Q: 数据存储在哪里？A: 数据存储在用户本地，不上传云端。`,
     },
   ];
 
-  // 5. 分块
+  // 4. 分块
   const allChunks = documents.flatMap(doc =>
     splitTextIntoChunks(doc.text, doc.source, { chunkSize: 200, overlap: 50 })
   );
 
-  // 6. 存入 Chroma（Chroma 会自动调用 embedder 做向量化）
-  await collection.add({
-    ids: allChunks.map(c => c.id),
-    documents: allChunks.map(c => c.text),
-    metadatas: allChunks.map(c => c.metadata),
-  });
+  // 5. 逐 chunk 用千问模型向量化，再显式存入 Chroma
+  for (const chunk of allChunks) {
+    const { embedding } = await embed({
+      model: dashscope.embeddingModel('qwen3.7-text-embedding-flash'),
+      value: chunk.text,
+    });
+    await collection.add({
+      ids: [chunk.id],
+      embeddings: [embedding],
+      documents: [chunk.text],
+      metadatas: [chunk.metadata],
+    });
+  }
 
   console.log(`成功索引 ${allChunks.length} 个 chunk`);
 }
@@ -925,27 +940,36 @@ indexDocuments().catch(console.error);
 // 完整的 RAG 查询流程
 
 import 'dotenv/config';
-import { generateText } from 'ai';
+import { generateText, embed } from 'ai';
 import { deepseek } from '@ai-sdk/deepseek';
-import { ChromaClient, OpenAIEmbeddingFunction } from 'chromadb';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import { ChromaClient } from 'chromadb';
+
+// 通义千问（阿里云百炼 DashScope）Embedding，走 OpenAI 兼容接口
+const dashscope = createOpenAICompatible({
+  name: 'dashscope',
+  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  apiKey: process.env.QWEN_API_KEY,
+});
 
 async function ragQuery(userQuestion: string) {
   // === 第一步：检索相关文档 ===
 
   const chroma = new ChromaClient();
-  const embedder = new OpenAIEmbeddingFunction({
-    openai_api_key: process.env.OPENAI_API_KEY!,
-    openai_model: 'text-embedding-3-small',
-  });
 
   const collection = await chroma.getCollection({
     name: 'company-docs',
-    embeddingFunction: embedder,
   });
 
-  // 向量检索 top-3
+  // 用千问模型把问题向量化
+  const { embedding: queryEmbedding } = await embed({
+    model: dashscope.embeddingModel('qwen3.7-text-embedding-flash'),
+    value: userQuestion,
+  });
+
+  // 向量检索 top-3（显式传入 queryEmbeddings）
   const searchResults = await collection.query({
-    queryTexts: [userQuestion],
+    queryEmbeddings: [queryEmbedding],
     nResults: 3,
   });
 
@@ -1010,14 +1034,20 @@ main().catch(console.error);
 // lib/rag-service.ts
 // 封装一个可复用的 RAG 服务类
 
-import { generateText, streamText } from 'ai';
-import { ChromaClient, OpenAIEmbeddingFunction } from 'chromadb';
+import { generateText, streamText, embed } from 'ai';
+import { deepseek } from '@ai-sdk/deepseek';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import { ChromaClient } from 'chromadb';
+
+// 通义千问（阿里云百炼 DashScope）Embedding，走 OpenAI 兼容接口
+const dashscope = createOpenAICompatible({
+  name: 'dashscope',
+  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  apiKey: process.env.QWEN_API_KEY,
+});
 
 interface RAGConfig {
   collectionName: string;
-  embeddingApiKey: string;
-  llmApiKey: string;
-  llmBaseURL: string;
   llmModel: string;
   topK?: number;
   similarityThreshold?: number; // 低于此阈值的结果不采用
@@ -1032,7 +1062,6 @@ interface RetrievalResult {
 export class RAGService {
   private config: RAGConfig;
   private chroma: ChromaClient;
-  private embedder: OpenAIEmbeddingFunction;
 
   constructor(config: RAGConfig) {
     this.config = {
@@ -1042,21 +1071,22 @@ export class RAGService {
     };
 
     this.chroma = new ChromaClient();
-    this.embedder = new OpenAIEmbeddingFunction({
-      openai_api_key: config.embeddingApiKey,
-      openai_model: 'text-embedding-3-small',
-    });
   }
 
   // 检索相关文档
   async retrieve(query: string): Promise<RetrievalResult[]> {
     const collection = await this.chroma.getCollection({
       name: this.config.collectionName,
-      embeddingFunction: this.embedder,
+    });
+
+    // 用千问模型把查询向量化
+    const { embedding } = await embed({
+      model: dashscope.embeddingModel('qwen3.7-text-embedding-flash'),
+      value: query,
     });
 
     const results = await collection.query({
-      queryTexts: [query],
+      queryEmbeddings: [embedding],
       nResults: this.config.topK,
     });
 
@@ -1094,7 +1124,7 @@ export class RAGService {
       .join('\n---\n');
 
     const { text } = await generateText({
-      model: this.config.llmModel,
+      model: deepseek(this.config.llmModel),
       instructions: `你是一个专业的客服助手。请根据以下参考资料回答用户的问题。
 只根据参考资料回答，不要编造信息。如果资料不足以回答，请如实告知。
 
@@ -1124,7 +1154,7 @@ ${context}`,
       .join('\n---\n');
 
     const result = streamText({
-      model: this.config.llmModel,
+      model: deepseek(this.config.llmModel),
       instructions: `你是一个专业的客服助手。请根据参考资料回答问题。
 只根据参考资料回答，不要编造。
 
@@ -1140,6 +1170,8 @@ ${context}`,
 
 ### 在 Next.js API Route 中使用
 
+> **回到主线项目**：第 1~4 步都是在独立的 `rag-demo` 里验证 RAG 逻辑。从这一步开始回到**主线 Next.js 项目**——把 `rag-demo` 里的 `lib/rag-service.ts` 复制到主线项目的 `lib/` 目录（这样就能用 `@/lib/rag-service` 导入），再新建下面的 `app/api/rag/route.ts`。同时记得在主线项目的 `.env.local` 里加上 `QWEN_API_KEY`（千问 Embedding 的 Key；`DEEPSEEK_API_KEY` 之前已经配过）。
+
 ```typescript
 // app/api/rag/route.ts
 // Next.js API Route —— 暴露 RAG 查询接口
@@ -1148,10 +1180,7 @@ import { RAGService } from '@/lib/rag-service';
 
 const rag = new RAGService({
   collectionName: 'company-docs',
-  embeddingApiKey: process.env.OPENAI_API_KEY!,
-  llmApiKey: process.env.DEEPSEEK_API_KEY!,
-  llmBaseURL: 'https://api.deepseek.com/v1',
-  llmModel: 'deepseek/deepseek-flash',
+  llmModel: 'deepseek-chat',
   topK: 5,
   similarityThreshold: 0.3,
 });

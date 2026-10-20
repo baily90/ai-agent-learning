@@ -1375,125 +1375,25 @@ main();
 // app/components/AgentChat.tsx
 'use client';
 import { useState } from 'react';
-
-// Agent 步骤的类型定义
-interface AgentStep {
-  type: 'thought' | 'action' | 'observation' | 'reflection' | 'answer';
-  content: string;
-  timestamp: number;
-  toolName?: string;
-  status?: 'running' | 'completed' | 'failed';
-}
-
-interface Message {
-  role: 'user' | 'agent';
-  content: string;
-  steps?: AgentStep[];
-}
+import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport } from 'ai';
 
 export default function AgentChat() {
-  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isRunning, setIsRunning] = useState(false);
-  const [currentSteps, setCurrentSteps] = useState<AgentStep[]>([]);
   const [showThoughts, setShowThoughts] = useState(false);
-  
-  const handleSubmit = async () => {
-    if (!input.trim() || isRunning) return;
-    
-    const userMessage = input;
+
+  // v7 写法：transport 指定 API 地址，sendMessage 发送消息
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({ api: '/api/agent' }),
+  });
+  const isLoading = status === 'submitted' || status === 'streaming';
+
+  const handleSubmit = () => {
+    if (!input.trim() || isLoading) return;
+    sendMessage({ text: input });
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
-    setIsRunning(true);
-    setCurrentSteps([]);
-    
-    try {
-      const response = await fetch('/api/agent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage }),
-      });
-      
-      // 假设后端返回 SSE 流，每行是一个 Agent 步骤
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      const steps: AgentStep[] = [];
-      let finalAnswer = '';
-      
-      while (reader) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n').filter(Boolean);
-        
-        for (const line of lines) {
-          try {
-            const step: AgentStep = JSON.parse(line);
-            steps.push(step);
-            setCurrentSteps([...steps]);
-            
-            if (step.type === 'answer') {
-              finalAnswer = step.content;
-            }
-          } catch {
-            // 忽略解析错误
-          }
-        }
-      }
-      
-      setMessages(prev => [
-        ...prev,
-        { role: 'agent', content: finalAnswer, steps },
-      ]);
-    } catch (error) {
-      console.error('Agent 错误:', error);
-      setMessages(prev => [
-        ...prev,
-        { role: 'agent', content: '抱歉，执行过程中出现了错误。' },
-      ]);
-    } finally {
-      setIsRunning(false);
-      setCurrentSteps([]);
-    }
   };
-  
-  // 渲染 Agent 的思维步骤
-  const renderSteps = (steps: AgentStep[]) => (
-    <div className="mt-2 border-l-2 border-gray-200 pl-3 space-y-1">
-      {steps.map((step, i) => (
-        <div key={i} className="text-sm">
-          {step.type === 'thought' && (
-            <div className="text-purple-600">
-              <span className="font-medium">思考：</span>
-              {step.content}
-            </div>
-          )}
-          {step.type === 'action' && (
-            <div className="text-blue-600">
-              <span className="font-medium">行动：</span>
-              {step.toolName && <code className="bg-blue-50 px-1 rounded">{step.toolName}</code>}
-              {' '}{step.content}
-              {step.status === 'running' && <span className="animate-pulse ml-1">...</span>}
-            </div>
-          )}
-          {step.type === 'observation' && (
-            <div className="text-green-600">
-              <span className="font-medium">结果：</span>
-              {step.content}
-            </div>
-          )}
-          {step.type === 'reflection' && (
-            <div className="text-amber-600">
-              <span className="font-medium">反思：</span>
-              {step.content}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-  
+
   return (
     <div className="flex flex-col h-screen max-w-2xl mx-auto">
       {/* 顶部设置栏 */}
@@ -1508,31 +1408,51 @@ export default function AgentChat() {
           显示思维过程
         </label>
       </div>
-      
+
       {/* 消息列表 */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-lg p-3 rounded-lg ${
-              msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100'
-            }`}>
-              <p className="whitespace-pre-wrap">{msg.content}</p>
-              {showThoughts && msg.steps && renderSteps(msg.steps)}
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`max-w-lg p-3 rounded-lg ${
+                message.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100'
+              }`}
+            >
+              {/* 按 part 类型渲染：text=回答，dynamic-tool=工具调用，reasoning=思考 */}
+              {message.parts.map((part, i) => {
+                if (part.type === 'text') {
+                  return <p key={i} className="whitespace-pre-wrap">{part.text}</p>;
+                }
+                if (part.type === 'dynamic-tool') {
+                  return (
+                    <div key={i} className="text-sm text-blue-600 border-l-2 border-blue-200 pl-2 my-1">
+                      <span className="font-medium">行动：</span>
+                      <code className="bg-blue-50 px-1 rounded">{part.toolName}</code>
+                      {' '}{JSON.stringify(part.input)}
+                      {part.state === 'output-available' && (
+                        <div className="text-green-600">结果：{JSON.stringify(part.output)}</div>
+                      )}
+                    </div>
+                  );
+                }
+                // reasoning 仅在使用推理模型（如 deepseek-reasoner）时才会出现
+                if (part.type === 'reasoning' && showThoughts) {
+                  return (
+                    <div key={i} className="text-sm text-purple-600 border-l-2 border-purple-200 pl-2 my-1">
+                      <span className="font-medium">思考：</span>{part.text}
+                    </div>
+                  );
+                }
+                return null;
+              })}
             </div>
           </div>
         ))}
-        
-        {/* 实时显示 Agent 执行过程 */}
-        {isRunning && currentSteps.length > 0 && (
-          <div className="flex justify-start">
-            <div className="max-w-lg p-3 rounded-lg bg-gray-50 border border-gray-200">
-              <div className="text-sm text-gray-500 mb-1">Agent 正在工作中...</div>
-              {renderSteps(currentSteps)}
-            </div>
-          </div>
-        )}
-        
-        {isRunning && currentSteps.length === 0 && (
+
+        {isLoading && (
           <div className="flex justify-start">
             <div className="p-3 rounded-lg bg-gray-50">
               <span className="animate-pulse">Agent 正在思考...</span>
@@ -1540,7 +1460,7 @@ export default function AgentChat() {
           </div>
         )}
       </div>
-      
+
       {/* 输入区域 */}
       <div className="p-4 border-t flex gap-2">
         <input
@@ -1550,14 +1470,14 @@ export default function AgentChat() {
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           placeholder="输入任务，让 Agent 自主完成..."
           className="flex-1 px-3 py-2 border rounded"
-          disabled={isRunning}
+          disabled={isLoading}
         />
         <button
           onClick={handleSubmit}
-          disabled={isRunning}
+          disabled={isLoading}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
         >
-          {isRunning ? '执行中...' : '发送'}
+          {isLoading ? '执行中...' : '发送'}
         </button>
       </div>
     </div>
@@ -1565,12 +1485,14 @@ export default function AgentChat() {
 }
 ```
 
+> 说明：前端用 `useChat` 直接消费实战 5 的 AI SDK 消息流。`dynamic-tool` part 展示「行动（工具名 + 入参 + 结果）」，`text` part 展示最终回答；`reasoning` part（思考过程）只有在模型本身支持推理输出时才会出现——`deepseek-chat` 不会产出，换成 `deepseek-reasoner` 才看得到，所以这里用 `showThoughts` 开关控制显示。
+
 ### 实战 5：Agent 后端 API（结合 Vercel AI SDK 的 stopWhen）
 
 ```typescript
 // app/api/agent/route.ts
 import { deepseek } from '@ai-sdk/deepseek';
-import { streamText, tool, isStepCount } from 'ai';
+import { streamText, tool, isStepCount, toUIMessageStream, createUIMessageStreamResponse } from 'ai';
 import { z } from 'zod';
 
 export async function POST(req: Request) {

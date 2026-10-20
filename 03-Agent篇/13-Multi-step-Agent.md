@@ -783,6 +783,8 @@ A: 取决于任务类型和成本。两种策略：
 
 我们来用 Vercel AI SDK 构建一个能自主规划并执行多步任务的 Agent。这个 Agent 接收一个研究主题，自动分解任务、执行搜索、整理分析、生成报告。
 
+> **项目归属**：本节全部代码都在**主线 Next.js 项目**里。其中 `types.ts`、`planner.ts`、`executor.ts`、`agent.ts` 这四个文件放在 `lib/` 目录下（也就是 `lib/types.ts`、`lib/planner.ts`、`lib/executor.ts`、`lib/agent.ts`），所以后面的路由用 `@/lib/agent`、前端组件用 `@/lib/types` 导入。`app/api/research/route.ts` 和 `components/MultiStepAgent.tsx` 照常放在各自目录。
+
 ```typescript
 // types.ts — 核心类型定义
 import { z } from 'zod';
@@ -827,7 +829,7 @@ export type AgentEvent =
 ```typescript
 // planner.ts — 任务分解模块
 import { deepseek } from '@ai-sdk/deepseek';
-import { generateText, Output, isStepCount } from 'ai';
+import { generateText, Output } from 'ai';
 import { PlanSchema, type Plan } from './types';
 
 export async function createPlan(userGoal: string): Promise<Plan> {
@@ -903,8 +905,8 @@ export function validatePlan(plan: Plan): { valid: boolean; issues: string[] } {
 ```typescript
 // executor.ts — 步骤执行引擎
 import { deepseek } from '@ai-sdk/deepseek';
-import { generateText, isStepCount } from 'ai';
-import type { Step, Checkpoint, AgentEvent } from './types';
+import { generateText } from 'ai';
+import type { Step, Plan, Checkpoint } from './types';
 
 // 单步执行器
 async function executeStep(
@@ -978,7 +980,8 @@ function saveCheckpoint(
 ```typescript
 // agent.ts — 多步 Agent 主流程
 import { createPlan, validatePlan } from './planner';
-import type { Plan, AgentEvent, Checkpoint } from './types';
+import { executeStep, saveCheckpoint } from './executor';
+import type { AgentEvent } from './types';
 
 interface AgentOptions {
   maxStepTimeMs?: number;    // 单步超时时间
