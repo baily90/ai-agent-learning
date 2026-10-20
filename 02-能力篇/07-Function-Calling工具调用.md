@@ -1175,9 +1175,9 @@ async function chat(userMessage: string) {
     onStepEnd: ({ toolCalls, toolResults }) => {
       if (toolCalls.length > 0) {
         toolCalls.forEach((tc, i) => {
-          console.log(`  [工具调用] ${tc.toolName}(${JSON.stringify(tc.args)})`);
+          console.log(`  [工具调用] ${tc.toolName}(${JSON.stringify(tc.input)})`);
           if (toolResults[i]) {
-            console.log(`  [工具结果] ${JSON.stringify(toolResults[i].result).slice(0, 100)}...`);
+            console.log(`  [工具结果] ${JSON.stringify(toolResults[i].output).slice(0, 100)}...`);
           }
         });
       }

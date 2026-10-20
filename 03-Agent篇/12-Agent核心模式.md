@@ -1001,12 +1001,12 @@ async function reactAgent(userMessage: string) {
   for (const step of result.steps) {
     if (step.toolCalls?.length) {
       for (const call of step.toolCalls) {
-        console.log(`🔧 调用工具: ${call.toolName}(${JSON.stringify(call.args)})`);
+        console.log(`🔧 调用工具: ${call.toolName}(${JSON.stringify(call.input)})`);
       }
     }
     if (step.toolResults?.length) {
       for (const res of step.toolResults) {
-        console.log(`📋 工具结果: ${JSON.stringify(res.result).slice(0, 100)}...`);
+        console.log(`📋 工具结果: ${JSON.stringify(res.output).slice(0, 100)}...`);
       }
     }
   }
