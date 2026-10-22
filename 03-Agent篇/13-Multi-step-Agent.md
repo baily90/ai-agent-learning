@@ -909,7 +909,7 @@ import { generateText } from 'ai';
 import type { Step, Plan, Checkpoint } from './types';
 
 // 单步执行器
-async function executeStep(
+export async function executeStep(
   step: Step,
   artifacts: Record<string, string>,
   maxRetries: number = 3
@@ -960,7 +960,7 @@ ${context ? `\n待审校的内容：\n${context}` : ''}`,
 }
 
 // 保存检查点
-function saveCheckpoint(
+export function saveCheckpoint(
   plan: Plan,
   artifacts: Record<string, string>,
   tokensUsed: number

@@ -422,9 +422,24 @@ npx tsc --init
     "target": "ES2022",
     "module": "Node16",
     "moduleResolution": "Node16",
+    "rootDir": "./src",
     "outDir": "./dist",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  }
+}
+```
+
+> **说明**：`rootDir` 指定源码根目录，避免编译产物里多出一层 `src/` 目录；`skipLibCheck` 跳过第三方依赖 `.d.ts` 的类型检查（MCP SDK 的类型声明与你的 TypeScript 版本可能不完全兼容，报错属于正常现象）。
+
+再给 `package.json` 加一个构建脚本，编译的同时给产物加上可执行权限：
+
+```json
+// package.json
+{
+  "scripts": {
+    "build": "tsc && chmod +x dist/index.js"
   }
 }
 ```
@@ -433,6 +448,7 @@ npx tsc --init
 
 ```typescript
 // src/index.ts
+#!/usr/bin/env node
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
@@ -688,7 +704,8 @@ main().catch(console.error);
 MCP 提供了一个命令行检查工具，可以用来测试你的 Server：
 
 ```bash
-# 安装 MCP Inspector
+# 先编译（并给产物加执行权限），再启动 Inspector
+npm run build
 npx @modelcontextprotocol/inspector dist/index.js
 ```
 
