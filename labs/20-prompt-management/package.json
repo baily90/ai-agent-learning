@@ -1,0 +1,21 @@
+{
+  "name": "lab-20-prompt-management",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lab 20 · 提示词管理（Langfuse Prompt Management）",
+  "type": "module",
+  "scripts": {
+    "ask": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "ai": "7.0.154",
+    "@ai-sdk/deepseek": "3.0.74",
+    "@langfuse/client": "6.0.2",
+    "dotenv": "18.0.9"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

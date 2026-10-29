@@ -1,0 +1,21 @@
+{
+  "name": "lab-06-tool-calling",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lab 06 · Function Calling / 工具调用",
+  "type": "module",
+  "scripts": {
+    "ask": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "ai": "7.0.154",
+    "@ai-sdk/deepseek": "3.0.74",
+    "dotenv": "18.0.9",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

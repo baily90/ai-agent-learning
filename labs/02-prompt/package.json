@@ -1,0 +1,20 @@
+{
+  "name": "lab-02-prompt",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lab 02 · Prompt 工程（system prompt / few-shot / CoT）",
+  "type": "module",
+  "scripts": {
+    "ask": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "ai": "7.0.154",
+    "@ai-sdk/deepseek": "3.0.74",
+    "dotenv": "18.0.9"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

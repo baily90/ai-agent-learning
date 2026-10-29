@@ -1,0 +1,23 @@
+{
+  "name": "lab-12-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lab 12 · MCP 协议（stdio 启动 MCP server + AI SDK 连接）",
+  "type": "module",
+  "scripts": {
+    "ask": "tsx src/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@ai-sdk/deepseek": "^3.0.74",
+    "@ai-sdk/mcp": "^2.0.85",
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "ai": "^7.0.154",
+    "dotenv": "^18.0.9",
+    "zod": "^4.6.7"
+  }
+}

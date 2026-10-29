@@ -10,8 +10,8 @@ export default defineConfig({
   base,
   cleanUrls: true,
   lastUpdated: true,
-  // 根目录的 README.md 不作为独立页面
-  srcExclude: ['README.md'],
+  // 根目录的 README.md 不作为独立页面，labs/ 是可运行代码仓库，不参与文档构建
+  srcExclude: ['README.md', 'labs/**'],
 
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config

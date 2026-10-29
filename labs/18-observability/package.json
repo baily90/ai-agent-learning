@@ -1,0 +1,43 @@
+{
+  "name": "observability-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI SDK 7 + DeepSeek 接入 Langfuse 可观测性实战样板",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "ask": "tsx src/index.ts",
+    "langfuse:up": "docker compose up -d",
+    "langfuse:down": "docker compose down",
+    "langfuse:logs": "docker compose logs -f langfuse-web"
+  },
+  "dependencies": {
+    "@ai-sdk/deepseek": "3.0.74",
+    "@langfuse/client": "6.0.2",
+    "@langfuse/otel": "6.0.2",
+    "@langfuse/tracing": "6.0.2",
+    "@langfuse/vercel-ai-sdk": "6.0.2",
+    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/sdk-node": "0.222.0",
+    "ai": "7.0.154",
+    "dotenv": "18.0.9",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "overrides": {
+    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/core": "2.11.0",
+    "@opentelemetry/resources": "2.11.0",
+    "@opentelemetry/sdk-trace": "2.11.0",
+    "@opentelemetry/sdk-trace-base": "2.11.0",
+    "@opentelemetry/sdk-logs": "0.222.0",
+    "@opentelemetry/sdk-metrics": "2.11.0",
+    "@opentelemetry/exporter-trace-otlp-http": "0.222.0",
+    "@opentelemetry/otlp-exporter-base": "0.222.0",
+    "@opentelemetry/otlp-transformer": "0.222.0"
+  }
+}
