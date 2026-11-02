@@ -6,12 +6,12 @@ import { deepseek } from "@ai-sdk/deepseek";
 import { z } from "zod";
 
 // ① 路由 agent：判断问题属于售前还是售后
-async function route(question: string): Promise<"售前" | "售后"> {
+async function route(question: string): Promise<"presale" | "aftersale" | "urgency"> {
   const result = await generateText({
     model: deepseek("deepseek-chat"),
-    prompt: `判断下面这个问题属于"售前"还是"售后"（售前=商品咨询/价格/库存/推荐，售后=退款/物流/投诉/维修）：\n${question}`,
+    prompt: `判断下面这个问题属于"售前"、"售后"、"工单"（售前(presale)=商品咨询/价格/库存/推荐，售后(aftersale)=退款/物流/投诉/维修，工单(urgency)=处理严重投诉提交工单、升级人工）：\n${question}`,
     output: Output.object({
-      schema: z.object({ category: z.enum(["售前", "售后"]) }),
+      schema: z.object({ category: z.enum(["presale", "aftersale", "urgency"]) }),
     }),
   });
   return result.output.category;
@@ -34,7 +34,36 @@ async function aftersaleAgent(question: string) {
     system: "你是售后客服，负责退款、物流、投诉、维修。回答要安抚情绪、给出可执行步骤。",
     prompt: question,
   });
+  
   return result.text;
+}
+
+
+// 4 工单agent：处理严重投诉提交工单、升级人工
+const urgencyAgent = async (question: string) => {
+  const result = await generateText({
+    model: deepseek('deepseek-chat'),
+    instructions: '你是一名资深的严重投诉的解决方案专家，你要针对用户的提问进行回复，并引导升级人工',
+    prompt: question,
+  })
+  
+  return result.text
+}
+
+// 5 审查agent： 针对给出的答复进行审查，检查是否合理或者是否需要补充
+const verifyAgent = async(question: string, draftAnswer: string) => {
+  const result  = await generateText({
+    model: deepseek('deepseek-chat'),
+    instructions: '你是一名资深的客服审查专家，你需要针对用户的提问和客服回复的内容进行审查，审查是否准确、专业以及有没有需要补充的，请优化并直接输出修正后的最终回复',
+    prompt: `用户输入的问题：${question}\n 客服回复的内容：${draftAnswer}`
+  })
+  return result.text
+}
+
+const routeAgent = {
+  presale: presaleAgent,
+  aftersale: aftersaleAgent,
+  urgency: urgencyAgent
 }
 
 async function main() {
@@ -44,10 +73,13 @@ async function main() {
   const category = await route(question);
   console.log(`🎯 路由结果：交给【${category}】agent 处理\n`);
 
-  const answer =
-    category === "售前" ? await presaleAgent(question) : await aftersaleAgent(question);
+  const answer = await routeAgent[category]?.(question)
 
   console.log(`🤖 【${category} agent】回答：\n` + answer);
+
+  const verify = await verifyAgent(question, answer)
+  console.log(`🤖 【verifyAgent】审查：\n` + verify);
+
 }
 
 main().catch((err) => {

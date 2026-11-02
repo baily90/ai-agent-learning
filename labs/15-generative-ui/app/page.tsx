@@ -18,6 +18,7 @@ export default function Page() {
       setInput("");
     }
   };
+  console.log(messages);
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", padding: 24 }}>

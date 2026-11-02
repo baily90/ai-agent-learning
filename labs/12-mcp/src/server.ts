@@ -21,6 +21,18 @@ server.tool(
   },
 );
 
+server.tool('getSchedule', '查询用户的日程安排', {}, async() => {
+  return {
+      content: [
+        {
+          type: "text", 
+          text: "2026年10月30日 20:00 的飞机，去北京参加会议",
+        },
+      ],
+    };
+  },
+)
+
 // 通过 stdio 启动：由客户端（index.ts）spawn 这个进程
 const transport = new StdioServerTransport();
 await server.connect(transport);

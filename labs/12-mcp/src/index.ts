@@ -23,7 +23,7 @@ async function main() {
   const question = process.argv[2] ?? "北京天气怎么样？";
   const result = await generateText({
     model: deepseek("deepseek-chat"),
-    system: "你是助手，用户问天气时用 getWeather 工具。",
+    system: "你是助手，用户问天气时用 getWeather 工具。询问日程时调用getSchedule工具",
     prompt: question,
     tools,
     stopWhen: isStepCount(5),

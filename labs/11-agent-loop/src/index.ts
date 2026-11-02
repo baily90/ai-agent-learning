@@ -30,6 +30,14 @@ const getRefundPolicy = tool({
   },
 });
 
+const submitRefundApply = tool({
+  description: '提交退款申请时调用该方法',
+  inputSchema: z.object({orderNo: z.string().describe('订单编号')}),
+  execute() {
+    return '提交退款申请成功'
+  }
+})
+
 async function main() {
   const question =
     process.argv[2] ?? "我的订单 20231001001 想退款，告诉我具体怎么做？";
@@ -38,11 +46,10 @@ async function main() {
     model: deepseek("deepseek-chat"),
     system: "你是电商客服。回答退款/订单问题前，先查订单状态，再查退款规则，最后综合回答。",
     prompt: question,
-    tools: { getOrder, getRefundPolicy },
+    tools: { getOrder, getRefundPolicy, submitRefundApply },
     // 允许最多 10 步工具调用（多步任务需要更多步数）
     stopWhen: isStepCount(10),
   });
-
   console.log("\n🔍 Agent 的工具调用过程：");
   for (const call of result.toolCalls) {
     console.log(`  1️⃣ ${call.toolName}(${JSON.stringify(call.input)})`);

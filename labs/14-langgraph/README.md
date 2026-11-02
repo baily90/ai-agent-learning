@@ -14,9 +14,54 @@ npm run ask "有什么推荐的手机壳？"
 ## 学什么
 
 - **LangGraph = 把 Agent/Workflow 画成一张图**：节点 = 步骤，边 = 流转关系
-- **混合工作流**：`classify` 是确定性代码（可预测），`answer` 是 LLM（灵活）——两者放进同一张图
+- **混合工作流**：`classify` 是确定性代码（可预测），`generate` 是 LLM（灵活）——两者放进同一张图
 - **State（状态）**：节点之间传递的共享数据
 - 核心 API：`Annotation.Root`（定义状态）、`StateGraph`（建图）、`addNode` / `addEdge`（加节点/边）
+
+## 示例 Demo（三种经典模式）
+
+`examples/` 下有三个可独立运行的示例，演示 LangGraph 最常见的三种"带循环"的模式：
+
+### 1. 多步 agent —— `demo:multi-step`
+
+查资料 → 反思 → 资料不够就再查 → 资料够才回答：
+
+```
+START → research → reflect ─┬─ 不够 → 回到 research
+                             └─ 够 → reply → END
+```
+
+```bash
+npm run demo:multi-step
+```
+
+### 2. 循环 / 重试 —— `demo:retry-loop`
+
+生成 → 评估打分 → 不合格就重生成：
+
+```
+START → generate → evaluate ─┬─ 不合格 → 回到 generate
+                              └─ 合格 → END
+```
+
+```bash
+npm run demo:retry-loop
+```
+
+### 3. 多 agent 协作 —— `demo:multi-agent`
+
+规划师 → 执行者 → 评审，评审不通过就带着反馈回头改：
+
+```
+START → planner → executor → reviewer ─┬─ 不通过 → 回到 executor
+                                        └─ 通过 → END
+```
+
+```bash
+npm run demo:multi-agent
+```
+
+> 三者共同点：**循环 = 条件边指回上游节点**；循环必须有**退出条件**（`rounds` / `attempt` / `revision` 计数器）；状态要在循环中**累积 / 回传**才有意义。
 
 ## 练什么（挑战）
 

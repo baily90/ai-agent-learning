@@ -13,7 +13,8 @@ export const maxDuration = 30;
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
-
+  console.log(messages);
+  
   const result = streamText({
     model: deepseek("deepseek-chat"),
     instructions: "你是电商客服。用户问订单时用 getOrder 工具查询后回答。",

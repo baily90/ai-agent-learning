@@ -26,7 +26,11 @@ npm run ask "怎么退款？"
 
 **挑战 2：prompt 缓存**
 
-DeepSeek 支持 prompt 缓存（相同前缀的输入会缓存，命中后更便宜）。连续两次调同一个 system prompt，观察 usage 里是否有缓存命中。
+DeepSeek 支持 prompt 缓存（相同前缀的输入会缓存，命中后更便宜）。连续两次调同一个 system prompt，观察 usage 里的命中情况：`inputTokenDetails.cacheReadTokens`（命中）/ `noCacheTokens`（未命中），或原始字段 `raw.prompt_cache_hit_tokens` / `prompt_cache_miss_tokens`。
+
+⚠️ 限制：缓存按 64 token 一个存储单元落盘，**短 prompt 不触发**——实测几十到 200 token 连调两次命中仍为 0，拉长到 1500+ token 才命中。所以 system prompt 要写得足够长（或用 `.repeat()` 重复一段话），且两次调用间留几秒让缓存落盘。
+
+来源：[DeepSeek 上下文缓存官方文档](https://api-docs.deepseek.com/zh-cn/guides/kv_cache/)
 
 **挑战 3：对应客服项目**
 

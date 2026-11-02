@@ -1,6 +1,7 @@
 // Lab 20 · 提示词管理（Langfuse Prompt Management）
 // 目标：把 prompt 从代码里抽出来，交给 Langfuse 版本化管理，代码里按版本获取
 import "dotenv/config";
+import { sdk } from "./instrumentation.js";
 import { generateText } from "ai";
 import { deepseek } from "@ai-sdk/deepseek";
 import { LangfuseClient } from "@langfuse/client";
@@ -17,7 +18,7 @@ async function main() {
   // ① 从 Langfuse 获取 prompt（第一次运行会自动创建）
   let prompt;
   try {
-    prompt = await langfuse.prompt.get("customer-service");
+    prompt = await langfuse.prompt.get("customer-service", {label: 'production'});
   } catch {
     prompt = await langfuse.prompt.create({
       name: "customer-service",
@@ -36,6 +37,10 @@ async function main() {
   const result = await generateText({
     model: deepseek("deepseek-chat"),
     prompt: compiled,
+    // functionId 让这条 trace 在 Langfuse 里有个可读的名字
+    telemetry: {
+      functionId: "customer-service",
+    },
   });
 
   console.log("🤖 回答：\n" + result.text);
@@ -43,7 +48,16 @@ async function main() {
   console.log("   你会看到这个 prompt 被版本化管理了。改它、发新版，代码不用动。");
 }
 
-main().catch((err) => {
+async function run() {
+  try {
+    await main();
+  } finally {
+    // 关键：强制把 span flush 到 Langfuse 再退出，否则 trace 会丢
+    await sdk.shutdown();
+  }
+}
+
+run().catch((err) => {
   console.error("❌ 调用失败：", err.message);
   process.exit(1);
 });
