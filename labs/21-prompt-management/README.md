@@ -1,4 +1,4 @@
-# Lab 20 · 提示词管理
+# Lab 21 · 提示词管理
 
 > 补充章节。目标：把 prompt 从代码里抽出来，交给 Langfuse 版本化管理。
 
@@ -6,7 +6,7 @@
 
 ```bash
 # 先起 Langfuse（复用 18-observability 的 docker compose）
-cd ../18-observability && docker compose up -d && cd ../20-prompt-management
+cd ../18-observability && docker compose up -d && cd ../21-prompt-management
 
 cp .env.example .env      # 填 DeepSeek key（Langfuse key 用默认）
 npm install
