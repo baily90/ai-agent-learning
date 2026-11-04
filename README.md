@@ -41,7 +41,10 @@
 - **AI SDK**：Vercel AI SDK（统一抽象层，可切换任意模型）
 - **模型**：DeepSeek（示例），可替换为 OpenAI / Claude / 其他
 - **前端**：React + Next.js
-- **向量数据库**：示例使用 Chroma / Pinecone
+- **向量数据库**：示例使用 Chroma / Pinecone，生产用 pgvector
+- **存储/加速**：PostgreSQL（持久化 + 向量）、Redis（限流/缓存/队列）
+- **可观测/评估**：Langfuse
+- **模型网关**：LiteLLM
 - **运行时**：Node.js
 
 ## 章节目录
@@ -94,6 +97,17 @@
 | [第22章](05-生产篇/22-可观测性与调试.md) | 可观测性与调试 | Tracing、日志、行为回放 |
 | [第23章](05-生产篇/23-性能优化与成本控制.md) | 性能优化与成本控制 | Prompt 缓存、Token 管理、限流 |
 | [第24章](05-生产篇/24-部署与架构.md) | 部署与架构 | Serverless、Edge、AI Gateway |
+
+### 第六部分：技术篇 — 真实项目里的主流技术栈
+
+| 章节 | 主题 | 关键词 |
+|------|------|--------|
+| [第25章](06-技术篇/25-Vercel-AI-SDK深入.md) | Vercel AI SDK 深入 | generateText、streamText、generateObject、tool、useChat |
+| [第26章](06-技术篇/26-PostgreSQL与pgvector.md) | PostgreSQL 与 pgvector | 持久化、向量检索、HNSW 索引、混合检索 |
+| [第27章](06-技术篇/27-LangGraph与LangChain.md) | LangGraph 与 LangChain | 图编排、State/Node/Edge、循环、checkpoint |
+| [第28章](06-技术篇/28-Redis.md) | Redis | 限流、缓存、会话、任务队列 |
+| [第29章](06-技术篇/29-Langfuse.md) | Langfuse | 可观测、Tracing、评估、Prompt 管理 |
+| [第30章](06-技术篇/30-LiteLLM与模型网关.md) | LiteLLM 与模型网关 | 多模型接入、统一密钥、fallback、成本追踪 |
 
 ### 附录
 

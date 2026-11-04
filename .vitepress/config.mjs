@@ -76,6 +76,18 @@ export default defineConfig({
         ]
       },
       {
+        text: '06 · 技术篇',
+        collapsed: false,
+        items: [
+          { text: 'Vercel AI SDK 深入', link: '/06-技术篇/25-Vercel-AI-SDK深入' },
+          { text: 'PostgreSQL 与 pgvector', link: '/06-技术篇/26-PostgreSQL与pgvector' },
+          { text: 'LangGraph 与 LangChain', link: '/06-技术篇/27-LangGraph与LangChain' },
+          { text: 'Redis', link: '/06-技术篇/28-Redis' },
+          { text: 'Langfuse', link: '/06-技术篇/29-Langfuse' },
+          { text: 'LiteLLM 与模型网关', link: '/06-技术篇/30-LiteLLM与模型网关' }
+        ]
+      },
+      {
         text: '附录',
         collapsed: false,
         items: [
