@@ -16,6 +16,8 @@ AI 开发的框架生态正处于"春秋战国"时期——新框架不断涌现
 4. **Mastra** — 新兴的 TypeScript AI 框架
 5. **CrewAI（JS 版）** — 多 Agent 框架
 
+> 📖 想系统学习 Mastra 的用法，见 [第七部分：Mastra 篇](07-Mastra篇/31-Mastra入门与核心心智)。
+
 ---
 
 ## 横向对比表

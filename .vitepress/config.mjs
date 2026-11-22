@@ -88,6 +88,19 @@ export default defineConfig({
         ]
       },
       {
+        text: '07 · Mastra 篇',
+        collapsed: false,
+        items: [
+          { text: 'Mastra 入门与核心心智', link: '/07-Mastra篇/31-Mastra入门与核心心智' },
+          { text: 'Agent 与 Tool', link: '/07-Mastra篇/32-Agent与Tool' },
+          { text: 'Workflow 编排', link: '/07-Mastra篇/33-Workflow编排' },
+          { text: '记忆与 RAG', link: '/07-Mastra篇/34-记忆与RAG' },
+          { text: '评估与可观测性', link: '/07-Mastra篇/35-评估与可观测性' },
+          { text: '多 Agent 与 MCP', link: '/07-Mastra篇/36-多Agent与MCP' },
+          { text: '部署与前端对接', link: '/07-Mastra篇/37-部署与前端对接' }
+        ]
+      },
+      {
         text: '附录',
         collapsed: false,
         items: [

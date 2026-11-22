@@ -33,12 +33,14 @@
 第17章  → 专业级交互体验
 第18章  → 生成式 UI（组件化展示）
 第24章  → 正式部署上线
+第31~37章  → Mastra 一站式重构（Agent/Workflow/Memory/Evals 全内置）
 ```
 
 ## 技术栈
 
 - **语言**：TypeScript
 - **AI SDK**：Vercel AI SDK（统一抽象层，可切换任意模型）
+- **Agent 框架**：Mastra（第七部分，AI SDK 之上的编排层）
 - **模型**：DeepSeek（示例），可替换为 OpenAI / Claude / 其他
 - **前端**：React + Next.js
 - **向量数据库**：示例使用 Chroma / Pinecone，生产用 pgvector
@@ -108,6 +110,18 @@
 | [第28章](06-技术篇/28-Redis.md) | Redis | 限流、缓存、会话、任务队列 |
 | [第29章](06-技术篇/29-Langfuse.md) | Langfuse | 可观测、Tracing、评估、Prompt 管理 |
 | [第30章](06-技术篇/30-LiteLLM与模型网关.md) | LiteLLM 与模型网关 | 多模型接入、统一密钥、fallback、成本追踪 |
+
+### 第七部分：Mastra 篇 — 用成熟框架一站式构建 Agent
+
+| 章节 | 主题 | 关键词 |
+|------|------|--------|
+| [第31章](07-Mastra篇/31-Mastra入门与核心心智.md) | Mastra 入门与核心心智 | 与 AI SDK 的关系、环境搭建、provider/model、CLI/Playground |
+| [第32章](07-Mastra篇/32-Agent与Tool.md) | Agent 与 Tool | Agent 定义、createTool、工具调用循环、结构化输出 |
+| [第33章](07-Mastra篇/33-Workflow编排.md) | Workflow 编排 | createWorkflow、step、并行、suspend/resume、快照 |
+| [第34章](07-Mastra篇/34-记忆与RAG.md) | 记忆与 RAG | Memory、语义召回、工作记忆、Knowledge |
+| [第35章](07-Mastra篇/35-评估与可观测性.md) | 评估与可观测性 | Scorer、Evals、Tracing、Studio |
+| [第36章](07-Mastra篇/36-多Agent与MCP.md) | 多 Agent 与 MCP | Subagents、Delegation、MCPClient |
+| [第37章](07-Mastra篇/37-部署与前端对接.md) | 部署与前端对接 | mastra build、Server Adapter、useChat |
 
 ### 附录
 

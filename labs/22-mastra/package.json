@@ -1,0 +1,27 @@
+{
+  "name": "lab-22-mastra",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lab 22 · Mastra 综合实战：智能工单客服 Agent",
+  "type": "module",
+  "scripts": {
+    "demo:agent": "tsx src/demo/agent.ts",
+    "demo:workflow": "tsx src/demo/workflow.ts",
+    "demo:memory": "tsx src/demo/memory.ts"
+  },
+  "dependencies": {
+    "@mastra/core": "latest",
+    "@mastra/evals": "latest",
+    "@mastra/libsql": "latest",
+    "@mastra/memory": "latest",
+    "@ai-sdk/deepseek": "latest",
+    "mastra": "latest",
+    "zod": "^3.24.0",
+    "dotenv": "^18.0.9"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
