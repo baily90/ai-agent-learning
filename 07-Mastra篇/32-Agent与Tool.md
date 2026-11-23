@@ -140,7 +140,7 @@ description: '根据订单号查询订单状态。当用户询问订单进度、
 
 ## 32.4 结构化输出：让 agent 返回 JSON
 
-企业场景里，你经常要 agent 返回结构化数据（第 5 章学过）。Mastra 的 Agent 支持 `output` 定义输出 schema：
+企业场景里，你经常要 agent 返回结构化数据（第 5 章学过）。Mastra 用 `structuredOutput` 定义输出 schema——注意 **agent 级别要放在 `defaultOptions.structuredOutput` 里，不是 `output` 字段**（`output` 只是旧的单次调用参数）：
 
 ```typescript
 import { z } from 'zod';
@@ -149,15 +149,25 @@ const agent = new Agent({
   name: 'ticket-classifier',
   model: 'deepseek/deepseek-chat',
   instructions: '把用户消息分类。',
-  output: z.object({
-    category: z.enum(['退款', '物流', '咨询', '投诉']),
-    urgency: z.enum(['低', '中', '高']),
-    summary: z.string().describe('一句话概括用户诉求'),
-  }),
+  defaultOptions: {
+    structuredOutput: {
+      schema: z.object({
+        category: z.enum(['退款', '物流', '咨询', '投诉']),
+        urgency: z.enum(['低', '中', '高']),
+        summary: z.string().describe('一句话概括用户诉求'),
+      }),
+    },
+  },
 });
 ```
 
-这样 agent 的每次返回都会被约束成这个 JSON 结构，类型也全程推导。
+这样 agent 的每次返回都会被约束成这个 JSON 结构。读取结果用 `response.object`（已按 schema 校验、带类型推导）：
+
+```typescript
+const response = await agent.generate('我要退款，订单号 ORD-1001');
+console.log(response.object.category);  // '退款'
+console.log(response.object.urgency);   // '高'
+```
 
 ---
 
@@ -268,7 +278,7 @@ export const mastra = new Mastra({
 
 **验收标准**：用户问「物流」时 agent 调 `checkLogistics`，问「订单」时调 `getOrder`，不混淆。
 
-**练习 2**：新建一个 `ticket-classifier` agent，用 `output` 让返回分类 JSON（退款/物流/咨询/投诉 + 紧急度）。
+**练习 2**：新建一个 `ticket-classifier` agent，用 `defaultOptions.structuredOutput` 让返回分类 JSON（退款/物流/咨询/投诉 + 紧急度）。
 
 **验收标准**：任意输入都能拿到合规的 JSON，类型不报错。
 
