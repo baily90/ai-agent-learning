@@ -95,14 +95,17 @@ const r = await supportAgent.generate('我刚才说我喜欢的颜色是什么�
 import { Agent } from '@mastra/core/agent';
 import { Memory } from '@mastra/memory';
 import { LibSQLStore, LibSQLVector } from '@mastra/libsql';
+import { ModelRouterEmbeddingModel } from '@mastra/core/llm';
 
 const supportAgent = new Agent({
+  id: 'support',
   name: 'support',
   model: 'deepseek/deepseek-chat',
   instructions: '你是客服助手。',
   memory: new Memory({
     storage: new LibSQLStore({ id: 'agent-storage', url: 'file:./local.db' }),
-    vector: new LibSQLVector({ id: 'agent-vector', /* ... */ }),
+    vector: new LibSQLVector({ id: 'agent-vector', url: 'file:./local.db' }),
+    embedder: new ModelRouterEmbeddingModel('openai/text-embedding-3-small'),
     options: {
       semanticRecall: true,       // 开启语义召回
     },
@@ -132,7 +135,7 @@ semantic recall 就是你在第 9 章手写的 RAG 管道的成品版：
 ```typescript
 memory: new Memory({
   options: {
-    workingMemory: true,      // 开启工作记忆
+    workingMemory: { enabled: true },   // 开启工作记忆
   },
 }),
 ```
@@ -227,20 +230,23 @@ import { Mastra } from '@mastra/core';
 import { Agent } from '@mastra/core/agent';
 import { Memory } from '@mastra/memory';
 import { LibSQLStore, LibSQLVector } from '@mastra/libsql';
+import { ModelRouterEmbeddingModel } from '@mastra/core/llm';
 
 const storage = new LibSQLStore({ id: 'storage', url: 'file:./mastra.db' });
 
 const supportAgent = new Agent({
+  id: 'support',
   name: 'support',
   model: 'deepseek/deepseek-chat',
   instructions: '你是客服，记住用户说过的重要信息（名字、诉求、偏好）。',
   memory: new Memory({
     storage,
-    vector: new LibSQLVector({ id: 'vector' }),
+    vector: new LibSQLVector({ id: 'vector', url: 'file:./mastra.db' }),
+    embedder: new ModelRouterEmbeddingModel('openai/text-embedding-3-small'),
     options: {
       lastMessages: 20,
       semanticRecall: true,        // 语义召回
-      workingMemory: true,         // 记住用户偏好
+      workingMemory: { enabled: true },   // 记住用户偏好
     },
   }),
 });

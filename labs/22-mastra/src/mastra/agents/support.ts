@@ -38,7 +38,7 @@ export const supportAgent = new Agent({
     storage: new LibSQLStore({ id: 'support-storage', url: 'file:./mastra.db' }),
     options: {
       lastMessages: 20,
-      workingMemory: true,          // 记住用户偏好（第34章）
+      workingMemory: { enabled: true },  // 记住用户偏好（第34章）
     },
   }),
   scorers: {

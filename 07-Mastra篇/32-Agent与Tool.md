@@ -48,7 +48,8 @@ Mastra 的 Agent 内部就是这段逻辑的成品版，还额外加了：自动
 import { Agent } from '@mastra/core/agent';
 
 const supportAgent = new Agent({
-  name: 'support',                    // 唯一标识
+  id: 'support',                    // 唯一标识
+  name: 'support',
   model: 'deepseek/deepseek-chat',    // provider/model 字符串
   instructions: '你是电商客服，语气友好，先安抚再解决问题。',
 });
@@ -62,6 +63,7 @@ const supportAgent = new Agent({
 
 ```typescript
 const agent = new Agent({
+  id: 'support',
   name: 'support',
   model: 'deepseek/deepseek-chat',
   instructions: `你是「云上商城」的售后客服。
@@ -77,6 +79,7 @@ const agent = new Agent({
 
 ```typescript
 const agent = new Agent({
+  id: 'support',
   name: 'support',
   model: 'deepseek/deepseek-chat',
   instructions: '你是售后客服。',
@@ -146,6 +149,7 @@ description: '根据订单号查询订单状态。当用户询问订单进度、
 import { z } from 'zod';
 
 const agent = new Agent({
+  id: 'ticket-classifier',
   name: 'ticket-classifier',
   model: 'deepseek/deepseek-chat',
   instructions: '把用户消息分类。',
@@ -251,6 +255,7 @@ import { Agent } from '@mastra/core/agent';
 import { getOrder } from '../tools/getOrder';
 
 export const supportAgent = new Agent({
+  id: 'support',
   name: 'support',
   model: 'deepseek/deepseek-chat',
   instructions: '你是售后客服，查询订单用 getOrder 工具，不要编造物流信息。',

@@ -244,6 +244,7 @@ import { Agent } from '@mastra/core/agent';
 
 // 定义一个 agent：注意 model 是字符串
 const agent = new Agent({
+  id: 'greeter',
   name: 'greeter',
   model: 'deepseek/deepseek-chat',
   instructions: '你是一个简洁友好的助手，回答不超过 50 字。',
