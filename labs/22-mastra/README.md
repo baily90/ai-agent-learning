@@ -1,6 +1,6 @@
 # Lab 22 · Mastra 综合实战：智能工单客服 Agent
 
-> 配套第 31~37 章。目标：用一个完整的「工单客服」项目，把 Mastra 七章的知识点全部串起来。
+> 配套第 31~40 章。目标：用一个完整的「工单客服」项目，把 Mastra 十章的知识点全部串起来。
 
 ## 跑起来
 
@@ -20,17 +20,18 @@ npm run demo:memory
 
 ## 学什么
 
-这是前面 30 章「亲手造轮子」的升级版——**同一个工单场景，用 Mastra 一站式搞定**。一个项目串起七章知识点：
+这是前面 30 章「亲手造轮子」的升级版——**同一个工单场景，用 Mastra 一站式搞定**。一个项目串起十章知识点：
 
 | 章节 | 知识点 | 在本项目的位置 |
 |------|--------|---------------|
 | 31 | 环境搭建、provider/model 字符串、资源注册 | `package.json` + `src/mastra/index.ts` |
-| 32 | Agent 定义 + createTool 工具 | `src/mastra/agents/support.ts` + `src/mastra/tools/order.ts` |
-| 33 | Workflow 编排 + suspend/resume 人工审批 | `src/mastra/workflows/ticket.ts` |
-| 34 | 记忆（workingMemory + resource/thread） | `support.ts` 的 `memory` 配置 |
-| 35 | 评测（scorer + sampling） | `support.ts` 的 `scorers` 配置 |
-| 36 | 多 Agent（subagents） | `support.ts` 的 `agents: { orderExpert, toneExpert }` |
-| 37 | 部署（mastra build / server adapter） | 见下方「部署与前端对接」 |
+| 32 | Agent 深入 | `src/mastra/agents/support.ts` |
+| 33 | Tool 深入（createTool） | `src/mastra/tools/order.ts` |
+| 34 | Workflow 编排 + suspend/resume 人工审批 | `src/mastra/workflows/ticket.ts` |
+| 35 | Memory 记忆（workingMemory + thread） | `support.ts` 的 `memory` 配置 |
+| 37 | 评估（scorer + sampling） | `support.ts` 的 `scorers` 配置 |
+| 39 | 多 Agent（subagents） | `support.ts` 的 `agents: { orderExpert, toneExpert }` |
+| 40 | 部署（mastra build / server adapter） | 见下方「部署与前端对接」 |
 
 ## 项目结构
 

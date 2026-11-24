@@ -33,7 +33,7 @@
 第17章  → 专业级交互体验
 第18章  → 生成式 UI（组件化展示）
 第24章  → 正式部署上线
-第31~37章  → Mastra 一站式重构（Agent/Workflow/Memory/Evals 全内置）
+第31~40章  → Mastra 一站式重构（Agent/Tool/Workflow/Memory/RAG/Evals 全深入）
 ```
 
 ## 技术栈
@@ -115,13 +115,16 @@
 
 | 章节 | 主题 | 关键词 |
 |------|------|--------|
-| [第31章](07-Mastra篇/31-Mastra入门与核心心智.md) | Mastra 入门与核心心智 | 与 AI SDK 的关系、环境搭建、provider/model、CLI/Playground |
-| [第32章](07-Mastra篇/32-Agent与Tool.md) | Agent 与 Tool | Agent 定义、createTool、工具调用循环、结构化输出 |
-| [第33章](07-Mastra篇/33-Workflow编排.md) | Workflow 编排 | createWorkflow、step、并行、suspend/resume、快照 |
-| [第34章](07-Mastra篇/34-记忆与RAG.md) | 记忆与 RAG | Memory、语义召回、工作记忆、Knowledge |
-| [第35章](07-Mastra篇/35-评估与可观测性.md) | 评估与可观测性 | Scorer、Evals、Tracing、Studio |
-| [第36章](07-Mastra篇/36-多Agent与MCP.md) | 多 Agent 与 MCP | Subagents、Delegation、MCPClient |
-| [第37章](07-Mastra篇/37-部署与前端对接.md) | 部署与前端对接 | mastra build、Server Adapter、useChat |
+| [第31章](07-Mastra篇/31-Mastra入门与核心心智.md) | Mastra 入门与核心心智 | 与 AI SDK 的关系、环境搭建、provider/model、CLI/Studio |
+| [第32章](07-Mastra篇/32-Agent深入.md) | Agent 深入 | Agent 全配置、流式、结构化输出、护栏/处理器、人工介入 |
+| [第33章](07-Mastra篇/33-Tool深入.md) | Tool 深入 | createTool 全配置、输入输出校验、renderOnly、审批 |
+| [第34章](07-Mastra篇/34-Workflow编排.md) | Workflow 编排 | then/parallel/branch/foreach、state、suspend/resume、时间旅行 |
+| [第35章](07-Mastra篇/35-Memory记忆.md) | Memory 记忆 | 消息历史、工作记忆、观察记忆、语义召回 |
+| [第36章](07-Mastra篇/36-RAG与知识Knowledge.md) | RAG 与知识 Knowledge | 知识图谱、page/note/scope、语义搜索 |
+| [第37章](07-Mastra篇/37-评估Evals.md) | 评估 Evals | Scorer、Dataset、Experiment |
+| [第38章](07-Mastra篇/38-可观测性Observability.md) | 可观测性 Observability | trace/span、日志、反馈、指标 |
+| [第39章](07-Mastra篇/39-多Agent与MCP.md) | 多 Agent 与 MCP | Subagents、Delegation、多 agent 模式、MCP/A2A |
+| [第40章](07-Mastra篇/40-部署与前端对接.md) | 部署与前端对接 | build、Server Adapter、云平台、useChat |
 
 ### 附录
 

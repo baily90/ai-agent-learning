@@ -92,12 +92,15 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: 'Mastra 入门与核心心智', link: '/07-Mastra篇/31-Mastra入门与核心心智' },
-          { text: 'Agent 与 Tool', link: '/07-Mastra篇/32-Agent与Tool' },
-          { text: 'Workflow 编排', link: '/07-Mastra篇/33-Workflow编排' },
-          { text: '记忆与 RAG', link: '/07-Mastra篇/34-记忆与RAG' },
-          { text: '评估与可观测性', link: '/07-Mastra篇/35-评估与可观测性' },
-          { text: '多 Agent 与 MCP', link: '/07-Mastra篇/36-多Agent与MCP' },
-          { text: '部署与前端对接', link: '/07-Mastra篇/37-部署与前端对接' }
+          { text: 'Agent 深入', link: '/07-Mastra篇/32-Agent深入' },
+          { text: 'Tool 深入', link: '/07-Mastra篇/33-Tool深入' },
+          { text: 'Workflow 编排', link: '/07-Mastra篇/34-Workflow编排' },
+          { text: 'Memory 记忆', link: '/07-Mastra篇/35-Memory记忆' },
+          { text: 'RAG 与知识 Knowledge', link: '/07-Mastra篇/36-RAG与知识Knowledge' },
+          { text: '评估 Evals', link: '/07-Mastra篇/37-评估Evals' },
+          { text: '可观测性 Observability', link: '/07-Mastra篇/38-可观测性Observability' },
+          { text: '多 Agent 与 MCP', link: '/07-Mastra篇/39-多Agent与MCP' },
+          { text: '部署与前端对接', link: '/07-Mastra篇/40-部署与前端对接' }
         ]
       },
       {
