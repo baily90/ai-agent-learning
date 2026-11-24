@@ -265,7 +265,7 @@ if (result.status === 'suspended') {
 **✅ DO：**
 
 - 每个 step 只做**一件事**，名字动词开头（`extract-info`、`check-logistics`）。
-- 用 `stateSchema` 存「贯穿全程」的进度/计数，用 input/output 传「步骤间」的数据。
+- 用 `stateSchema`（`state`/`setState`）存「贯穿全程」的进度/计数；用 `inputSchema`/`outputSchema`（`inputData`）传「步骤间」的数据。
 - 高风险操作（退款、发券、发邮件）前加 suspend 审批。
 - 并行步骤里自己 try/catch，做部分容错。
 
