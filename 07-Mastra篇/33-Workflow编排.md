@@ -172,6 +172,7 @@ const approvalStep = createStep({
   inputSchema: z.object({ orderId: z.string(), amount: z.number() }),
   outputSchema: z.object({ decision: z.string() }),
   resumeSchema: z.object({ approved: z.boolean() }),   // 恢复时要传的数据
+  suspendSchema: z.object({ reason: z.string(), amount: z.number() }),   // suspend 要传的数据
   execute: async ({ inputData, resumeData, suspend }) => {
     const { amount } = inputData;
     const { approved } = resumeData ?? {};             // 恢复时才有值
@@ -303,6 +304,7 @@ const refundApproval = createStep({
   inputSchema: z.object({ orderId: z.string(), amount: z.number() }),
   outputSchema: z.object({ decision: z.string() }),
   resumeSchema: z.object({ approved: z.boolean() }),
+  suspendSchema: z.object({ reason: z.string() }),
   execute: async ({ inputData, resumeData, suspend }) => {
     const { approved } = resumeData ?? {};
     if (approved === undefined) {
@@ -333,7 +335,7 @@ if (result.status === 'suspended') {
   console.log('等待人工审批…');
   // 人工点了「通过」后：
   const final = await run.resume({ step: 'refund-approval', resumeData: { approved: true } });
-  console.log(final.output);
+  console.log(final.result);
 }
 ```
 

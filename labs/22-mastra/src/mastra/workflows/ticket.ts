@@ -54,6 +54,7 @@ const refundApproval = createStep({
   }),
   outputSchema: z.object({ decision: z.string() }),
   resumeSchema: z.object({ approved: z.boolean() }),
+  suspendSchema: z.object({ reason: z.string() }),
   execute: async ({ inputData, resumeData, suspend }) => {
     const { intent, amount } = inputData;
     if (intent !== '退款') {
